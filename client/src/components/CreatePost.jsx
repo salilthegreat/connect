@@ -1,11 +1,12 @@
-import { Cancel, GifBox, Image, VideoLibrary } from '@mui/icons-material'
-import React, { Fragment, useState } from 'react'
+import { GifBox, Image, VideoLibrary } from '@mui/icons-material'
+import React, { Fragment } from 'react'
 import { styled } from 'styled-components'
 
 const MainDiv = styled.div`
     display: flex;
     flex-direction: column;
     padding: 20px;
+    height: 120px;
     background-color: #ebe7e7;
     -webkit-box-shadow: 0px -1px 16px -3px #000000; 
     border-radius: 10px;
@@ -31,29 +32,6 @@ outline: none;
 padding: 0px 20px;
 font-weight: 300;
 `
-const DisplayImgContainer = styled.div`
-    display: flex;
-    position: relative;
-`
-const DisplayVid = styled.video`
-    width: 100%;
-    height: 300px;
-    object-fit: contain;
-    outline:none;
-`
-
-const DisplayImg = styled.img`
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-    outline: none;
-`
-const Cross = styled.span`
-    position: absolute;
-    right: 0;
-`
-
-
 const Hr = styled.hr`
     height: 0.5px;
 `
@@ -91,8 +69,6 @@ cursor: pointer;
 
 
 const CreatePost = () => {
-    const [file,setFile] = useState(null)
-    const [video,setVideo] = useState(null)
     return (
         <Fragment>
             <MainDiv>
@@ -100,36 +76,24 @@ const CreatePost = () => {
                     <ProfilePic src='https://images.unsplash.com/photo-1602442787305-decbd65be507?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80'></ProfilePic>
                     <SearchBar placeholder={"What's on your mind..."}></SearchBar>
                 </Top>
-                {file &&<DisplayImgContainer>
-                    <DisplayImg src={URL.createObjectURL(file)}/>
-                    <Cross>
-                    <Cancel style={{color:"gray"}} onClick = {(e)=>setFile(null)}/>
-                    </Cross>
-                </DisplayImgContainer> }
-                {video &&<DisplayImgContainer>
-                    <DisplayVid src={URL.createObjectURL(video)}  controls/>
-                    <Cross>
-                    <Cancel style={{color:"gray"}} onClick = {(e)=>setVideo(null)}/>
-                    </Cross>
-                </DisplayImgContainer> }
                 <Hr />
                 <Bottom>
                     <BottomLeft>
                         <IconHolder>
                             <Label htmlFor="image"> <Image style={{ marginRight: "5Px", height: "18px", color: "grey" }} /></Label>
                             Images
-                            <Input name='image' id='image' type='file' accept='.png,.jpeg,.jpg' onChange={(e)=>setFile(e.target.files[0])} />
+                            <Input name='image' id='image' type='file' accept='.png,.jpeg,.jpg' />
                         </IconHolder>
                         <IconHolder>
                             <Label htmlFor="video"> <VideoLibrary style={{ marginRight: "5Px", height: "18px", color: "grey" }} /></Label>
                             Videos
-                            <Input name='video' id='video' type='file' accept='.mp4,.mov' onChange={(e)=>setVideo(e.target.files[0])} />
+                            <Input name='video' id='video' type='file' accept='.mp4,.mov' />
 
                         </IconHolder>
                         <IconHolder>
                             <Label htmlFor="gif" > <GifBox style={{ marginRight: "5Px", height: "18px", color: "grey" }} /></Label>
                             Gifs
-                            <Input name='gif' id='gif' type='file' accept='.gif' onChange={(e)=>setFile(e.target.files[0])} />
+                            <Input name='gif' id='gif' type='file' accept='.gif' />
                         </IconHolder>
                     </BottomLeft>
                     <BottomRight>
