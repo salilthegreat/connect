@@ -7,9 +7,11 @@ const Nav = styled.nav`
     background-color: #cbc9c9;
     display: flex;
     justify-content:space-between;
-    align-items: center;
+    align-items: center;  
+    position:sticky        ;
+    /* width: 100%; */
     `
-const LeftNav = styled.div`
+const LeftNav = styled.aside`
 display: flex;
 align-items: center;
 `
@@ -88,6 +90,7 @@ color: white;
 const Navbar = () => {
   return (
     <Fragment>
+        
         <Nav>
             <LeftNav>
                 <Logo src='https://cdn.pixabay.com/photo/2014/04/09/17/48/man-320276_1280.png'></Logo>

@@ -1,12 +1,11 @@
-import { GifBox, Image, VideoLibrary } from '@mui/icons-material'
-import React, { Fragment } from 'react'
+import { Cancel, GifBox, Image,  VideoLibrary } from '@mui/icons-material'
+import React, { Fragment, useState } from 'react'
 import { styled } from 'styled-components'
 
 const MainDiv = styled.div`
     display: flex;
     flex-direction: column;
     padding: 20px;
-    height: 120px;
     background-color: #ebe7e7;
     -webkit-box-shadow: 0px -1px 16px -3px #000000; 
     border-radius: 10px;
@@ -66,9 +65,27 @@ font-size: 13px;
 color: white;
 cursor: pointer;
 `
+const ImgContainer = styled.div`
+display: flex;`
+const PreviewImg = styled.img`
+width: 100%;
+height: 300px;
+object-fit: contain;
+`
+const VidContainer = styled.div`
+display: flex;
+`
+const ClearPreview = styled.span`
 
+`
+const PreviewVid = styled.video`
+width: 100%;
+height: 300px;
+object-fit: contain;`
 
 const CreatePost = () => {
+    const [file, setFile] = useState(null)
+    const [video, setVideo] = useState(null)
     return (
         <Fragment>
             <MainDiv>
@@ -76,24 +93,36 @@ const CreatePost = () => {
                     <ProfilePic src='https://images.unsplash.com/photo-1602442787305-decbd65be507?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80'></ProfilePic>
                     <SearchBar placeholder={"What's on your mind..."}></SearchBar>
                 </Top>
+                {file && <ImgContainer>
+                    <PreviewImg src={URL.createObjectURL(file)}/>
+                    <ClearPreview>
+                        <Cancel onClick = {(e)=>setFile(null)}/>
+                    </ClearPreview>
+                </ImgContainer>}
+                {video && <VidContainer>
+                    <PreviewVid src={URL.createObjectURL(video)} controls />
+                    <ClearPreview>
+                        <Cancel onClick= {(e)=>setVideo(null)} />
+                    </ClearPreview>
+                </VidContainer>}
                 <Hr />
                 <Bottom>
                     <BottomLeft>
                         <IconHolder>
                             <Label htmlFor="image"> <Image style={{ marginRight: "5Px", height: "18px", color: "grey" }} /></Label>
                             Images
-                            <Input name='image' id='image' type='file' accept='.png,.jpeg,.jpg' />
+                            <Input name='image' id='image' type='file' accept='.png,.jpeg,.jpg' onChange={(e) => setFile(e.target.files[0])} />
                         </IconHolder>
                         <IconHolder>
                             <Label htmlFor="video"> <VideoLibrary style={{ marginRight: "5Px", height: "18px", color: "grey" }} /></Label>
                             Videos
-                            <Input name='video' id='video' type='file' accept='.mp4,.mov' />
+                            <Input name='video' id='video' type='file' accept='.mp4,.mov' onChange={(e) => setVideo(e.target.files[0])} />
 
                         </IconHolder>
                         <IconHolder>
                             <Label htmlFor="gif" > <GifBox style={{ marginRight: "5Px", height: "18px", color: "grey" }} /></Label>
                             Gifs
-                            <Input name='gif' id='gif' type='file' accept='.gif' />
+                            <Input name='gif' id='gif' type='file' accept='.gif' onChange={(e) => setFile(e.target.files[0])} />
                         </IconHolder>
                     </BottomLeft>
                     <BottomRight>
