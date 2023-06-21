@@ -8,8 +8,10 @@ const Nav = styled.nav`
     display: flex;
     justify-content:space-between;
     align-items: center;  
-    position:sticky        ;
-    /* width: 100%; */
+    position:sticky ;
+    top: 0;
+    width: 100%;
+    z-index: 10;
     `
 const LeftNav = styled.aside`
 display: flex;

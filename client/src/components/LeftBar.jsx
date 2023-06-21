@@ -6,7 +6,7 @@ const Container = styled.div`
     flex: 1.5;
     height: calc(100vh - 50px);
     /* background-color: blue; */
-    overflow-y: scroll;
+    /* overflow-y: scroll; */
     position: sticky;
     top: 60px;
     
