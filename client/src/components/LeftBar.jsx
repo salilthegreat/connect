@@ -24,9 +24,9 @@ align-items: center;
 margin-bottom: 30px;
 padding: 20px;
 background-color: #ebe7e7;
-    -webkit-box-shadow: 0px -1px 16px -3px #000000; 
-    border-radius: 10px;
-    box-shadow: 0px -1px 16px -3px #000000;
+border-radius: 10px;
+    /* -webkit-box-shadow: 0px -1px 16px -3px #000000;  */
+    box-shadow: 0px 4px 12px 0px #155dec87;
 `
 const UserImg = styled.img`
 width: 40px;

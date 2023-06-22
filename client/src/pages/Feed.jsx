@@ -8,6 +8,8 @@ import Rightbar from '../components/Rightbar'
 
 const MainDiv = styled.div`
     display: flex;
+    background-color: #f2f5ff;
+    color: #14080E;
 `
 
 const Feed = () => {

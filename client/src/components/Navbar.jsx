@@ -4,7 +4,7 @@ import {Home,Notifications, Message, Person, Search} from "@mui/icons-material"
 
 const Nav = styled.nav`
     height: 50px;
-    background-color: #cbc9c9;
+    background-color: var(--subtitile-text);
     display: flex;
     justify-content:space-between;
     align-items: center;  
@@ -96,10 +96,10 @@ const Navbar = () => {
         <Nav>
             <LeftNav>
                 <Logo src='https://cdn.pixabay.com/photo/2014/04/09/17/48/man-320276_1280.png'></Logo>
-                <SearchBox>
+                {/* <SearchBox>
                 <SearchBar placeholder='Search for...'></SearchBar>
                 <Search style={{position:"absolute",height:"18px",color:"grey"}} />
-                </SearchBox>
+                </SearchBox> */}
             </LeftNav>
             <MiddleNav>
                 <LinkWrapper><Home style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Home</LinkWrapper>
