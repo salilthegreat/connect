@@ -5,6 +5,7 @@ const morgan = require("morgan")
 const helmet = require("helmet")
 const cors = require("cors")
 const authRoute = require("./routes/auth")
+const userRoute = require("./routes/user")
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(helmet())
 app.use(cors())
 
 app.use("/api/auths",authRoute)
+app.use("/api/users",userRoute)
 
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log("DB connected successfully")

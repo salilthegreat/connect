@@ -23,11 +23,11 @@ router.post("/register", async (req, res) => {
 })
 
 //jwt creating functions
-const createAccessToken = ({ userName, isAdmin }) => {
-    return jwt.sign({ userName, isAdmin }, process.env.JWT_SECRET, { expiresIn: "1d" })
+const createAccessToken = ({ userId, isAdmin }) => {
+    return jwt.sign({ userId, isAdmin }, process.env.JWT_SECRET, { expiresIn: "1d" })
 }
-const createRefreshToken = ({ userName, isAdmin }) => {
-    return jwt.sign({ userName, isAdmin }, process.env.JWT_SECRET)
+const createRefreshToken = ({ userId, isAdmin }) => {
+    return jwt.sign({ userId, isAdmin }, process.env.JWT_SECRET)
 }
 
 //LOGIN
@@ -38,8 +38,8 @@ router.post("/login", async (req, res) => {
         if (!user) return res.status(401).json("Username dosen't exist");
         let isValid = await bcrypt.compare(password, user.password);
         if (!isValid) return res.status(401).json("Password invalid")
-        const accessToken =  createAccessToken({ userName, isAdmin: user.isAdmin })
-        const refreshToken = createRefreshToken({ userName, isAdmin: user.isAdmin })
+        const accessToken =  createAccessToken({ userId:user._id, isAdmin: user.isAdmin })
+        const refreshToken = createRefreshToken({ userId:user._id, isAdmin: user.isAdmin })
         res.status(200).json({ ...user._doc, accessToken, refreshToken })
     } catch (error) {
         res.status(500).json(error)

@@ -16,6 +16,8 @@ const UserSchmea = new mongoose.Schema(
         linkedIn: {type: String},
         profilePicture: {type: String},
         coverPicture: {type: String},
+        followers:{type: Array},
+        followings:{type: Array}
     },
     {timestamps: true}
 )
