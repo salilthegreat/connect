@@ -41,12 +41,12 @@ router.get("/findsorted", verifyToken, async (req, res) => {
 })
 
 //UPDATE USER
-router.put("/update/:id", verifyTokenAndAuthorization, async (req, res) => {
+router.put("/update/:userId", verifyTokenAndAuthorization, async (req, res) => {
     try {
         if (req.body.password) {
             req.body.password = await bcrypt.hash(req.body.password, 10);
         }
-        const updatedUser = await User.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
+        const updatedUser = await User.findByIdAndUpdate(req.params.userId, { $set: req.body }, { new: true })
         res.status(200).json(updatedUser)
     } catch (error) {
         res.status(500).json(error)
@@ -55,9 +55,9 @@ router.put("/update/:id", verifyTokenAndAuthorization, async (req, res) => {
 })
 
 //DELETE USER
-router.delete("/delete/:id", verifyTokenAndAuthorization, async (req, res) => {
+router.delete("/delete/:userId", verifyTokenAndAuthorization, async (req, res) => {
     try {
-        await User.findByIdAndDelete(req.params.id);
+        await User.findByIdAndDelete(req.params.userId);
         res.status(200).json("User deleted successfully")
     } catch (error) {
         res.status(500).json(error)

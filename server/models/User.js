@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const {Schema} = mongoose
 
 const UserSchmea = new mongoose.Schema(
     {
@@ -16,8 +17,8 @@ const UserSchmea = new mongoose.Schema(
         linkedIn: {type: String},
         profilePicture: {type: String},
         coverPicture: {type: String},
-        followers:{type: Array},
-        followings:{type: Array}
+        followers:[{type: Schema.Types.ObjectId,ref:"User"}],
+        followings:[{type: Schema.Types.ObjectId,ref:"User"}]
     },
     {timestamps: true}
 )

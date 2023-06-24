@@ -6,7 +6,7 @@ const helmet = require("helmet")
 const cors = require("cors")
 const authRoute = require("./routes/auth")
 const userRoute = require("./routes/user")
-
+const postRoute = require("./routes/post")
 const app = express();
 
 
@@ -19,6 +19,7 @@ app.use(cors())
 
 app.use("/api/auths",authRoute)
 app.use("/api/users",userRoute)
+app.use("/api/posts",postRoute)
 
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log("DB connected successfully")
