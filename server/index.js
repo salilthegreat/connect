@@ -8,6 +8,8 @@ const authRoute = require("./routes/auth")
 const userRoute = require("./routes/user")
 const postRoute = require("./routes/post")
 const commentRoute = require("./routes/comment")
+const conversationRoute = require("./routes/conversation")
+const messageRoute = require("./routes/message")
 
 const app = express();
 
@@ -19,16 +21,18 @@ app.use(morgan("common"))
 app.use(helmet())
 app.use(cors())
 
-app.use("/api/auths",authRoute)
-app.use("/api/users",userRoute)
-app.use("/api/posts",postRoute)
-app.use("/api/comments",commentRoute)
+app.use("/api/auths", authRoute)
+app.use("/api/users", userRoute)
+app.use("/api/posts", postRoute)
+app.use("/api/comments", commentRoute)
+app.use("/api/conversations", conversationRoute)
+app.use("/api/messages", messageRoute)
 
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log("DB connected successfully")
 }).catch((err) =>
     console.log(err))
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
     res.status(200).json(req.body)
 })
 
