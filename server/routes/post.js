@@ -1,6 +1,5 @@
 const Post = require("../models/Post");
 const User = require("../models/User");
-const { route } = require("./auth");
 const { verifyToken, verifyTokenAndAuthorization } = require("./verifyToken");
 
 const router = require("express").Router();

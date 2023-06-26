@@ -67,6 +67,7 @@ router.delete("/delete/:userId", verifyTokenAndAuthorization, async (req, res) =
 //FOLLOW/UNFOLLOW A USER
 router.put("/follow/:userId", verifyToken,async (req, res) => {
     try {
+        if(req.user.userId == req.params.userId) return res.status(403).json("Don't you dare follow yourself, asshole")
         const currentUser =await  User.findById(req.user.userId); //user who wants to follow
         const secondUser = await User.findById(req.params.userId);
         if (secondUser.followers.includes(req.user.userId)) {
@@ -83,4 +84,23 @@ router.put("/follow/:userId", verifyToken,async (req, res) => {
     }
 })
 
+//GET FOLLOWERS
+router.get("/followers/:userId",verifyToken,async(req,res)=>{
+    try {
+        const user = await User.findById(req.params.userId).populate({path:"followers",select:["userName","firstName","lastName","profilePicture"]}).exec();
+        res.status(200).json(user.followers)
+    } catch (error) {
+        res.status(500).json(error.message)
+    }
+})
+
+//GET FOLLOWINGS
+router.get("/followings/:userId",verifyToken,async(req,res)=>{
+    try {
+        const user = await User.findById(req.params.userId).populate({path:"followings",select:["userName","firstName","lastName","profilePicture"]});
+        res.status(200).json(user.followings)
+    } catch (error) {
+        res.status(500).json(error.message)
+    }
+})
 module.exports = router;
