@@ -1,6 +1,11 @@
-import { Fragment } from "react"
-import { Link } from "react-router-dom"
+import { Fragment, useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
+import { Login } from "../redux/apiCalls"
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { apiCallStart, refreshLogin } from "../redux/UserSlice"
 
 
 const Navbar = styled.nav`
@@ -94,6 +99,13 @@ border-radius: 5px;
 font-size: 11px;
 font-weight: 300;
 `
+const ErrorMsg = styled.div`
+  color: red;
+  font-size: 11px;
+  font-weight: 400;
+  text-align: center;
+`
+
 const ButtonWrapper = styled.div`
 padding: 15px;
 text-align: center;
@@ -122,43 +134,74 @@ const Span = styled.span`
 `
 
 const LogIn = () => {
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
+
+  const {currentUser,loading,error} = useSelector((state)=>state.user)
+
+  const [userCredentials, setUserCredentials] = useState({
+    userName: "",
+    password: ""
+  })
+
+  const handleChange = (e) => {
+    setUserCredentials(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+  useEffect(()=>{
+    dispatch(refreshLogin())
+  })
+
+  useEffect(()=>{
+    currentUser && toast("Login Successful")
+    currentUser && navigate("/feed")
+  },[currentUser])
+
+  const handleLogin =  (e) => {
+    e.preventDefault()
+    Login(dispatch,userCredentials);
+  }
+
   return (
     <Fragment>
-    <Navbar>
-    Connect
-  </Navbar>
-    <Maindiv>
-    <ImgHolder>
-      <TopImg src="https://cdn.pixabay.com/photo/2014/04/09/17/48/man-320276_1280.png" alt="" />
-    </ImgHolder>
-    <ContainerDiv>
-      <Leftdiv>
-      </Leftdiv>
-      <Rightdiv>
-        <Heading>Hello again!</Heading>
-        <Subtitle>Welcome back you've been missed!🙂 </Subtitle>
-        <Form>
-        <InputWrapperFlex>
-          <InputWrapper>
-            <Label>Email</Label>
-            <Input type="email" placeholder="johndoe@gmail.com"></Input>
-          </InputWrapper>
-        </InputWrapperFlex>
-          <InputWrapperFlex>
-          <InputWrapper>
-            <Label>Password</Label>
-            <Input type="password" placeholder="password"></Input>
-          </InputWrapper>
-          </InputWrapperFlex> 
-          <ButtonWrapper>
-          <Button>Log In</Button>
-          </ButtonWrapper>
-        </Form>
-        <SignUpMsg>Don't have an account? <Span><Link to={"/signup"}>SignUp</Link></Span></SignUpMsg>
-      </Rightdiv>
-    </ContainerDiv>
-  </Maindiv>
-  </Fragment>
+      <Navbar>
+        Connect
+      </Navbar>
+      <Maindiv>
+        <ImgHolder>
+          <TopImg src="https://cdn.pixabay.com/photo/2014/04/09/17/48/man-320276_1280.png" alt="" />
+        </ImgHolder>
+        <ContainerDiv>
+          <Leftdiv>
+          </Leftdiv>
+          <Rightdiv>
+            <Heading>Hello again!</Heading>
+            <Subtitle>Welcome back you've been missed!🙂 </Subtitle>
+            <Form>
+            {error && <ErrorMsg>{(error===401) && "Invalid username or password"}</ErrorMsg>}
+             {error && <ErrorMsg>{(error===500) && "Something went wrong"}</ErrorMsg>}
+              <InputWrapperFlex>
+                <InputWrapper>
+                  <Label>Email</Label>
+                  <Input type="email" name="userName" placeholder="johndoe@gmail.com" onChange={handleChange}></Input>
+                </InputWrapper>
+              </InputWrapperFlex>
+              <InputWrapperFlex>
+                <InputWrapper>
+                  <Label>Password</Label>
+                  <Input type="password" name="password" placeholder="password" onChange={handleChange}></Input>
+                </InputWrapper>
+              </InputWrapperFlex>
+              <ButtonWrapper>
+                <Button onClick={handleLogin}> {loading ? "Loading" : "Log In" }</Button>
+              </ButtonWrapper>
+            </Form>
+            <SignUpMsg>Don't have an account? <Span><Link to={"/signup"}>SignUp</Link></Span></SignUpMsg>
+          </Rightdiv>
+          <ToastContainer />
+        </ContainerDiv>
+      </Maindiv>
+    </Fragment>
   )
 }
 

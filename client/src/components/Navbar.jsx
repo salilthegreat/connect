@@ -1,6 +1,9 @@
 import React, { Fragment } from 'react'
 import { styled } from 'styled-components'
-import {Home,Notifications, Message, Person, Search} from "@mui/icons-material"
+import {Home,Notifications, Message, Person, PowerSettingsNew} from "@mui/icons-material"
+import { useDispatch, useSelector } from 'react-redux'
+import { logOut } from '../redux/UserSlice'
+import { useNavigate } from 'react-router-dom'
 
 const Nav = styled.nav`
     height: 50px;
@@ -12,6 +15,8 @@ const Nav = styled.nav`
     top: 0;
     width: 100%;
     z-index: 10;
+    padding: 0 10px;
+    box-sizing: border-box;
     `
 const LeftNav = styled.aside`
 display: flex;
@@ -22,23 +27,23 @@ const Logo = styled.img`
     width: 40px;
     transform: scaleX(-1);
 `
-const SearchBox = styled.div`
-display: flex;
-align-items: center;
-position: relative;
-`
+// const SearchBox = styled.div`
+// display: flex;
+// align-items: center;
+// position: relative;
+// `
 
-const SearchBar = styled.input`
- width: 100%;
- height: 15px;
- border-radius: 13px;
- padding: 5px 25px;
- border: 1px solid gray;
- font-weight: 300;
- font-size: 13px;
- outline: none;
+// const SearchBar = styled.input`
+//  width: 100%;
+//  height: 15px;
+//  border-radius: 13px;
+//  padding: 5px 25px;
+//  border: 1px solid gray;
+//  font-weight: 300;
+//  font-size: 13px;
+//  outline: none;
 
-`
+// `
 const MiddleNav = styled.div`
 display: flex;
 align-items: center;
@@ -70,7 +75,23 @@ const Badges = styled.span`
      justify-content: center;
 `
 
-const RightNav = styled.div``
+const RightNav = styled.div`
+display: flex;
+align-items: center;
+`
+
+const LogOutButton = styled.button`
+    padding: 0px;
+    margin: 0px;
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0px;
+`
+
 const Profile = styled.div`
 display: flex;
 align-items: center;
@@ -90,16 +111,19 @@ color: white;
 `
 
 const Navbar = () => {
+    const {currentUser} = useSelector((state)=>state.user)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const handleLogout = () =>{
+        dispatch(logOut());
+        navigate("/")
+    }
   return (
     <Fragment>
         
         <Nav>
             <LeftNav>
                 <Logo src='https://cdn.pixabay.com/photo/2014/04/09/17/48/man-320276_1280.png'></Logo>
-                {/* <SearchBox>
-                <SearchBar placeholder='Search for...'></SearchBar>
-                <Search style={{position:"absolute",height:"18px",color:"grey"}} />
-                </SearchBox> */}
             </LeftNav>
             <MiddleNav>
                 <LinkWrapper><Home style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Home</LinkWrapper>
@@ -110,8 +134,11 @@ const Navbar = () => {
             <RightNav>
                 <Profile>
                     <ProfilePic src='https://images.unsplash.com/photo-1602442787305-decbd65be507?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80'></ProfilePic>
-                    <Name>Jane Doe</Name>
+                    <Name>{currentUser?.firstName + " " + currentUser?.lastName}</Name>
                 </Profile>
+                <LogOutButton onClick={handleLogout}>
+                    <PowerSettingsNew style={{height:"15px",padding:"0",margin:"0px"}} />
+                </LogOutButton>
             </RightNav>
         </Nav>
     </Fragment>
