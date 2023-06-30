@@ -1,6 +1,9 @@
 import { Edit, Facebook, Home, Instagram, LinkedIn, Message, Notifications, Person, Send, Settings } from '@mui/icons-material'
 import React, { Fragment, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, redirect } from 'react-router-dom'
 import { styled } from 'styled-components'
+import { UpdateUser } from '../redux/apiCalls'
 
 const Container = styled.div`
     flex: 1.5;
@@ -71,6 +74,7 @@ font-weight: 300;
 gap: 10px;
 border-radius: 15px;
 padding:  5px;
+color: gray;
 cursor: pointer;
 &:hover{
   background-color: lightgray;
@@ -101,12 +105,33 @@ cursor: pointer;
 const ImageLink = styled.a``
 
 const LeftBar = () => {
+
+  const dispatch = useDispatch()
+  const { currentUser } = useSelector((state) => state.user)
+
   const [showInputInsta, setShowInputInsta] = useState(false)
   const [showInputFb, setShowInputFb] = useState(false)
   const [showInputLin, setShowInputLin] = useState(false)
-  const [insta, setInsta] = useState("")
-  const [facebook, setFacebook] = useState("")
-  const [linkedIn, setLinkedIn] = useState("")
+  const [updateData, setUpdateData] = useState({})
+
+  const handleChange = (e) => {
+    setUpdateData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+  console.log(updateData);
+  const userId = currentUser._id;
+
+  const handleUpdate = (check) => {
+    UpdateUser(dispatch,userId,updateData)
+    if(check==="insta"){
+      setShowInputInsta(!showInputInsta)
+    } else if(check === "fb"){
+    setShowInputFb(!showInputFb)
+  }else if(check === "lIn"){
+    setShowInputLin(!showInputLin)
+  }
+}
+
+
   return (
     <Fragment>
       <Container>
@@ -114,8 +139,8 @@ const LeftBar = () => {
           <TopDiv>
             <UserImg src='https://images.unsplash.com/photo-1602442787305-decbd65be507?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80' />
             <UserDetails>
-              <Username>Keyley Gunner</Username>
-              <Location>NewJercy,Manhatten</Location>
+              <Username>{currentUser?.firstName + " " + currentUser?.lastName}</Username>
+              <Location>{(currentUser.currentCity) && currentUser?.currentCity},{(currentUser.currentCity) && currentUser?.country}</Location>
             </UserDetails>
             <UpdateProfile>
               <Settings style={{ color: "gray", fontSize: "18px" }} />
@@ -123,27 +148,27 @@ const LeftBar = () => {
           </TopDiv>
 
           <MiddleDiv>
-            <LinkHolder><Home style={{ height: "20px", color: "gray" }}/>Home</LinkHolder>
-            <LinkHolder><Person style={{ height: "20px", color: "gray" }}/>Profile</LinkHolder>
-            <LinkHolder><Notifications style={{ height: "20px", color: "gray" }}/>Notifications</LinkHolder>
-            <LinkHolder><Message style={{ height: "20px", color: "gray" }}/>Messages</LinkHolder>
+            <Link to={"/feed"} style={{ textDecoration: "none" }}> <LinkHolder><Home style={{ height: "20px", color: "gray" }} />Home</LinkHolder></Link>
+            <Link to={"/profile"} style={{ textDecoration: "none" }}><LinkHolder><Person style={{ height: "20px", color: "gray" }} />Profile</LinkHolder></Link>
+            <Link to={"/"} style={{ textDecoration: "none" }}><LinkHolder><Notifications style={{ height: "20px", color: "gray" }} />Notifications</LinkHolder></Link>
+            <Link to={"/message"} style={{ textDecoration: "none" }}><LinkHolder><Message style={{ height: "20px", color: "gray" }} />Messages</LinkHolder></Link>
           </MiddleDiv>
 
           <BottomDiv>
             <Heading>SOCIALS</Heading>
             <SocialHolder>
-              <ImageLink href={showInputInsta}><Instagram /></ImageLink>
-              {showInputInsta && <><input type="text" onChange={(e) => setInsta(e.target.value)} /><Send style={{ height: "16px", color: "gray" }} onClick={(e) => setShowInputInsta(!showInputInsta)}/></>}
+              <ImageLink href={currentUser?.instagram}><Instagram /></ImageLink>
+              {showInputInsta && <><input name='instagram' type="text" defaultValue={currentUser?.instagram} onChange={handleChange} /><Send style={{ height: "16px", color: "gray" }} onClick={()=>handleUpdate("insta")} /></>}
               <Edit onClick={(e) => setShowInputInsta(!showInputInsta)} style={{ height: "16px", color: "gray" }} />
             </SocialHolder>
             <SocialHolder>
-              <ImageLink href={showInputFb}><Facebook /></ImageLink>
-              {showInputFb && <><input type="text" onChange={(e) => setFacebook(e.target.value)} /><Send style={{ height: "16px", color: "gray" }} onClick={(e) => setShowInputFb(!showInputFb)} /></>}
+              <ImageLink href={currentUser?.facebook}><Facebook /></ImageLink>
+              {showInputFb && <><input name='facebook' type="text" defaultValue={currentUser?.facebook} onChange={handleChange} /><Send style={{ height: "16px", color: "gray" }} onClick={()=>handleUpdate("fb")} /></>}
               <Edit onClick={(e) => setShowInputFb(!showInputFb)} style={{ height: "16px", color: "gray" }} />
             </SocialHolder>
             <SocialHolder>
-              <ImageLink href={showInputLin}><LinkedIn /></ImageLink>
-              {showInputLin && <><input type="text" onChange={(e) => setLinkedIn(e.target.value)} /><Send style={{ height: "16px", color: "gray" }} onClick={(e) => setShowInputLin(!showInputLin)}/></>}
+              <ImageLink href={currentUser?.linkedIn}><LinkedIn /></ImageLink>
+              {showInputLin && <><input name='linkedIn' type="text" defaultValue={currentUser?.linkedIn} onChange={handleChange} /><Send style={{ height: "16px", color: "gray" }} onClick={()=>handleUpdate("lIn")} /></>}
               <Edit onClick={(e) => setShowInputLin(!showInputLin)} style={{ height: "16px", color: "gray" }} />
             </SocialHolder>
           </BottomDiv>

@@ -3,7 +3,7 @@ import { styled } from 'styled-components'
 import {Home,Notifications, Message, Person, PowerSettingsNew} from "@mui/icons-material"
 import { useDispatch, useSelector } from 'react-redux'
 import { logOut } from '../redux/UserSlice'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const Nav = styled.nav`
     height: 50px;
@@ -126,10 +126,10 @@ const Navbar = () => {
                 <Logo src='https://cdn.pixabay.com/photo/2014/04/09/17/48/man-320276_1280.png'></Logo>
             </LeftNav>
             <MiddleNav>
-                <LinkWrapper><Home style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Home</LinkWrapper>
-                <LinkWrapper><Person style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Profile</LinkWrapper>
-                <LinkWrapper><Notifications style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Notifications<Badges>11</Badges></LinkWrapper>
-                <LinkWrapper><Message style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Messages<Badges>3</Badges></LinkWrapper>
+            <Link to={"/feed"} style={{textDecoration:"none"}}><LinkWrapper><Home style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Home</LinkWrapper></Link>
+                <Link to={"/profile"} style={{textDecoration:"none"}}><LinkWrapper><Person style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Profile</LinkWrapper></Link>
+                <Link to={"/"} style={{textDecoration:"none"}}><LinkWrapper><Notifications style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Notifications<Badges>11</Badges></LinkWrapper></Link>
+                <Link to={"/message"} style={{textDecoration:"none"}}><LinkWrapper><Message style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Messages<Badges>3</Badges></LinkWrapper></Link>
             </MiddleNav>
             <RightNav>
                 <Profile>

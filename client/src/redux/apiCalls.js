@@ -1,7 +1,7 @@
 //LOGIN CALL
 
-import { publicRequest } from "../requestMetohd"
-import { apiCallError, apiCallStart, loginSuccess, signUpSuccess } from "./UserSlice"
+import { publicRequest, userRequest } from "../requestMetohd"
+import { apiCallError, apiCallStart, loginSuccess, signUpSuccess, updateUserSuccess } from "./UserSlice"
 
 export const Login =async (dispatch,userCredentials)=>{
     dispatch(apiCallStart())
@@ -13,6 +13,8 @@ export const Login =async (dispatch,userCredentials)=>{
     }
 }
 
+//SIGNUP CALL
+
 export const SignUp = async(dispatch,userCredentials)=>{
     dispatch(apiCallStart());
     try {
@@ -23,3 +25,18 @@ export const SignUp = async(dispatch,userCredentials)=>{
         dispatch(apiCallError(error.response.status))     
     }
 }
+
+//UPDATE USER
+export const UpdateUser = async(dispatch,userId,updateData) =>{
+    dispatch(apiCallStart());
+    try {
+        const res = await userRequest.put(`/users/update/${userId}`,updateData);
+        console.log(res.data)
+        dispatch(updateUserSuccess(res.data));
+    } catch (error) {
+        console.log(error)
+        dispatch(apiCallError(error.response.status))
+    }
+}
+
+//
