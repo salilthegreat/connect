@@ -1,8 +1,9 @@
 //LOGIN CALL
 
 import { publicRequest, userRequest } from "../requestMetohd"
-import { apiCallError, apiCallStart, loginSuccess, signUpSuccess, updateUserSuccess } from "./UserSlice"
+import { apiCallError, apiCallStart, createPostSuccess, loginSuccess, signUpSuccess, updateUserSuccess } from "./UserSlice"
 
+//LOGIN CALL
 export const Login =async (dispatch,userCredentials)=>{
     dispatch(apiCallStart())
     try {
@@ -14,7 +15,6 @@ export const Login =async (dispatch,userCredentials)=>{
 }
 
 //SIGNUP CALL
-
 export const SignUp = async(dispatch,userCredentials)=>{
     dispatch(apiCallStart());
     try {
@@ -39,4 +39,15 @@ export const UpdateUser = async(dispatch,userId,updateData) =>{
     }
 }
 
-//
+//CREATE A POST
+export const NewPost = async(dispatch,postData) =>{
+    dispatch(apiCallStart());
+    try {
+        const res = await userRequest.post("/posts/create",postData)
+        dispatch(createPostSuccess())
+        console.log(res)
+    } catch (error) {
+        console.log(error);
+        dispatch(apiCallError(error.response.status))
+    }
+}

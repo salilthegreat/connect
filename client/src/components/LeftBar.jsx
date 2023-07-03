@@ -1,7 +1,7 @@
 import { Edit, Facebook, Home, Instagram, LinkedIn, Message, Notifications, Person, Send, Settings } from '@mui/icons-material'
 import React, { Fragment, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, redirect } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { styled } from 'styled-components'
 import { UpdateUser } from '../redux/apiCalls'
 

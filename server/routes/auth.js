@@ -24,7 +24,7 @@ router.post("/register", async (req, res) => {
 
 //jwt creating functions
 const createAccessToken = ({ userId, isAdmin }) => {
-    return jwt.sign({ userId, isAdmin }, process.env.JWT_SECRET, { expiresIn: "1d" })
+    return jwt.sign({ userId, isAdmin }, process.env.JWT_SECRET, { expiresIn: "7d" })
 }
 const createRefreshToken = ({ userId, isAdmin }) => {
     return jwt.sign({ userId, isAdmin }, process.env.JWT_SECRET)

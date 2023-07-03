@@ -11,6 +11,13 @@ const commentRoute = require("./routes/comment")
 const conversationRoute = require("./routes/conversation")
 const messageRoute = require("./routes/message")
 
+//imports for cloudinary
+const cloudinary = require("cloudinary").v2;
+const multer = require("multer")
+const {CloudinaryStorage} = require("multer-storage-cloudinary")
+
+
+
 const app = express();
 
 
@@ -20,6 +27,35 @@ app.use(express.json())
 app.use(morgan("common"))
 app.use(helmet())
 app.use(cors())
+
+//configuration for cloudinary
+cloudinary.config({
+    cloud_name:process.env.CLOUD_NAME,
+    api_key:process.env.CLOUDINARY_API_KEY,
+    api_secret:process.env.CLOUDINARY_API_SECRET
+})
+
+//making a storage 
+const storage = new CloudinaryStorage({
+    cloudinary:cloudinary,
+    params:{
+        folder:"DEV"
+    },
+})
+
+//assigning the storage we made from cloudinary to multer for uploadinf
+const upload = multer({storage:storage})
+
+//api call for file upload
+
+app.post("/api/upload",upload.single("file"),(req,res)=>{
+    try {
+        res.status(200).json({file:req.file.path})
+    } catch (error) {
+        res.status(500).json(error.message)
+    }
+})
+
 
 app.use("/api/auths", authRoute)
 app.use("/api/users", userRoute)

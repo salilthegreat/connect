@@ -1,6 +1,9 @@
-import { Cancel, GifBox, Image,  VideoLibrary } from '@mui/icons-material'
+import { Cancel, GifBox, Image, VideoLibrary } from '@mui/icons-material'
 import React, { Fragment, useState } from 'react'
 import { styled } from 'styled-components'
+import { NewPost } from '../redux/apiCalls'
+import { useDispatch } from 'react-redux'
+import {  userRequest } from '../requestMetohd'
 
 const MainDiv = styled.div`
     display: flex;
@@ -23,7 +26,7 @@ border-radius: 50%;
 object-fit: cover;
 cursor: pointer;
 `
-const SearchBar = styled.input`
+const PostDesc = styled.input`
 width: 90%;
 border-radius: 20px;
 border: 1px solid grey;
@@ -64,6 +67,9 @@ font-weight: 300;
 font-size: 13px;
 color: white;
 cursor: pointer;
+&:disabled{
+    background-color: red;
+}
 `
 const ImgContainer = styled.div`
 display: flex;`
@@ -84,25 +90,59 @@ height: 300px;
 object-fit: contain;`
 
 const CreatePost = () => {
+    const[uploading,setUploading] = useState(false)
+    const validPost = new RegExp(/^\S/)
     const [file, setFile] = useState(null)
     const [video, setVideo] = useState(null)
+    const [post, setPost] = useState({
+        description: ""
+    });
+    const newPost = {
+        description:post.description
+    }
+    const dispatch = useDispatch()
+    // const uploading = false;
+
+    const handlePost = async (e) => {
+        e.preventDefault();
+        if(file){
+            setUploading(true)
+            const data = new FormData();
+            const fileName = new Date().getTime() + file.name;
+            data.append("name",fileName)
+            data.append("file",file)
+            try {
+                const res = await userRequest.post("/upload",data);
+                console.log(res.data.file)
+                newPost.img = res.data.file;
+            } catch (error) {
+                console.log(error)
+            }
+            setUploading(false)
+        }
+        NewPost(dispatch, newPost);
+        setPost({ description: "" })
+        setFile(null)
+    }
+    console.log(post)
+    // console.log(file)
     return (
         <Fragment>
             <MainDiv>
                 <Top>
                     <ProfilePic src='https://images.unsplash.com/photo-1602442787305-decbd65be507?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80'></ProfilePic>
-                    <SearchBar placeholder={"What's on your mind..."}></SearchBar>
+                    <PostDesc name='description' value={post.description} onChange={(e) => setPost((prev) => ({ ...prev, [e.target.name]: e.target.value }))} placeholder={"What's on your mind..."}></PostDesc>
                 </Top>
                 {file && <ImgContainer>
-                    <PreviewImg src={URL.createObjectURL(file)}/>
+                    <PreviewImg src={URL.createObjectURL(file)} />
                     <ClearPreview>
-                        <Cancel onClick = {(e)=>setFile(null)}/>
+                        <Cancel onClick={(e) => setFile(null)} />
                     </ClearPreview>
                 </ImgContainer>}
                 {video && <VidContainer>
                     <PreviewVid src={URL.createObjectURL(video)} controls />
                     <ClearPreview>
-                        <Cancel onClick= {(e)=>setVideo(null)} />
+                        <Cancel onClick={(e) => setVideo(null)} />
                     </ClearPreview>
                 </VidContainer>}
                 <Hr />
@@ -126,7 +166,8 @@ const CreatePost = () => {
                         </IconHolder>
                     </BottomLeft>
                     <BottomRight>
-                        <PostButton>Post</PostButton>
+                        <PostButton onClick={handlePost} disabled={!validPost.test(post.description) || uploading}   >{uploading ? "posting":"Post"}</PostButton>
+                        {/* <PostButton onClick={handlePost} disabled={progress>0 && progress<100}   >{loading ? "posting":"Post"}</PostButton> */}
                     </BottomRight>
                 </Bottom>
             </MainDiv>
