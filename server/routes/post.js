@@ -46,7 +46,7 @@ router.get("/getfeed",verifyToken,async(req,res)=>{
         }       
         ))
        const feedPosts = myPosts.concat(...friendPosts)
-        res.status(200).json(feedPosts)
+        res.status(200).json(feedPosts.sort((a,b)=>b.createdAt - a.createdAt))
     } catch (error) {
         res.status(500).json(error.message)
     }

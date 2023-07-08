@@ -7,9 +7,14 @@ import {
   MoreVert,
   Send,
 } from "@mui/icons-material";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { styled } from "styled-components";
 import Comment from "./Comment";
+import { userRequest } from "../requestMetohd";
+import { useDispatch, useSelector } from "react-redux";
+import { apiCallError } from "../redux/UserSlice";
+import ReactTimeAgo from 'react-time-ago'
+import { CreateComment, DeletePost, UpdatePost } from "../redux/apiCalls";
 
 const DelteModal = styled.div`
   background-color: gray;
@@ -45,7 +50,7 @@ const KeepPost = styled.button`
     font-weight: 300;
     font-size: 11px;
 `
-const DeletePost = styled.button`
+const DeleteButton = styled.button`
     padding: 5px 15px;
     border-radius: 15px;
     border: none;
@@ -190,35 +195,88 @@ const CommentGroup = styled.div`
   gap: 5px;
 `;
 
-const Post = () => {
+const Post = ({ item }) => {
+  const { currentUser } = useSelector((state) => state.user)
   const [liked, setLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [edit, setEdit] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [del, setDel] = useState(false);
+  const [user, setUser] = useState({})
+  const dispatch = useDispatch();
+  const [description, setDescription] = useState({})
+  const [comment, setComment] = useState({
+    comment: ""
+  })
+  const [comments, setComments] = useState([])
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        //  dispatch(apiCallStart()) 
+        const res = await userRequest.get(`/users/find/${item?.userId}`);
+        setUser(res.data)
+      } catch (error) {
+        dispatch(apiCallError(error.response.status))
+        console.log(error)
+      }
+    }
+    getUser();
+  }, [item, dispatch])
+
+  const handleDelte = (postId) => {
+    DeletePost(dispatch, postId, currentUser._id)
+    setDel(!del)
+  }
+
+  const handleUpdate = (postId) => {
+    UpdatePost(dispatch, postId, currentUser._id, description)
+    setShowInput(!showInput)
+  }
+
+  const handleComment = (postId) => {
+    CreateComment(dispatch, postId, currentUser._id, comment)
+    setComment({
+      comment: ""
+    })
+  }
+
+  useEffect(() => {
+    const getComments = async () => {
+      try {
+        const res = await userRequest.get(`/comments/${item?._id}`);
+        console.log(res.data)
+        setComments(res.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    getComments();
+  }, [item])
+
+  console.log(comment)
   return (
     <Fragment>
       <MainDiv>
         {del && <DelteModal>
-            <Ques>Are you sure?</Ques>
-            <ButtonGroup>
-                <KeepPost onClick={(e)=>setDel(!del)}>Keep</KeepPost>
-                <DeletePost>Delete</DeletePost>
-            </ButtonGroup>
-            </DelteModal>}
+          <Ques>Are you sure?</Ques>
+          <ButtonGroup>
+            <KeepPost onClick={(e) => setDel(!del)} >Keep</KeepPost>
+            <DeleteButton onClick={() => handleDelte(item._id)}>Delete</DeleteButton>
+          </ButtonGroup>
+        </DelteModal>}
         <UserSection>
           <UserSectionLeft>
-            <ProfilePic src="https://plus.unsplash.com/premium_photo-1671586882920-8cd59c84cdfe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" />
+            <ProfilePic src={currentUser?.profilePicture ? currentUser?.profilePicture : "http://localhost:5000/static/profilePic.png"} />
             <UserDetails>
-              <Name>Anna Parker</Name>
-              <Time>1 minute ago</Time>
+              <Name>{user?.userName}</Name>
+              <Time><ReactTimeAgo date={Date.parse(item?.createdAt)} locale="en-US" /></Time>
             </UserDetails>
           </UserSectionLeft>
           <UserSectionRight>
-            <MoreVert
+            {(currentUser._id === item.userId) && <MoreVert
               style={{ marginRight: "5Px", height: "18px", color: "grey" }}
               onClick={(e) => setEdit(!edit)}
-            />
+            />}
             {edit && (
               <>
                 <Delete
@@ -233,19 +291,19 @@ const Post = () => {
             )}
           </UserSectionRight>
         </UserSection>
-        <Text>Hello! there this is my new post</Text>
+        {!showInput && <Text>{item.description}</Text>}
         {showInput && (
           <InputWrapper>
-            <EditInput defaultValue={`Hello! there this is my new post`} />
+            <EditInput defaultValue={item?.description} name="description" onChange={(e) => setDescription({ [e.target.name]: e.target.value })} />
             <Send
               style={{ marginRight: "5Px", height: "18px", color: "grey" }}
-              onClick = {(e)=>setShowInput(!showInput)}
+              onClick={() => handleUpdate(item._id)}
             />
           </InputWrapper>
         )}
-        <ImageWrapper>
-          <Image src="https://plus.unsplash.com/premium_photo-1671586882920-8cd59c84cdfe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"></Image>
-        </ImageWrapper>
+        {item?.img && <ImageWrapper>
+          <Image src={item?.img} ></Image>
+        </ImageWrapper>}
         <Bottom>
           <BottomHolder onClick={(e) => setLiked(!liked)}>
             {liked ? (
@@ -257,28 +315,30 @@ const Post = () => {
                 style={{ marginRight: "5Px", height: "18px", color: "grey" }}
               />
             )}
-            <Counts>5 likes</Counts>
+            <Counts>{item?.likes.length} likes</Counts>
           </BottomHolder>
           <BottomHolder onClick={(e) => setShowComments(!showComments)}>
             <InsertComment
               style={{ marginRight: "5Px", height: "18px", color: "grey" }}
             />
-            <Counts>2 comments</Counts>
+            <Counts>{item?.comments.length} comments</Counts>
           </BottomHolder>
         </Bottom>
         <Hr />
         <CommentsContainer>
           <CurrentUserComment>
-            <ProfileComment src="https://images.unsplash.com/photo-1602442787305-decbd65be507?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" />
-            <Input type="text" placeholder="Write a comment..." />
+            <ProfileComment src={currentUser?.profilePicture ? currentUser?.profilePicture : "http://localhost:5000/static/profilePic.png"} />
+            <Input type="text" name="comment" placeholder="Write a comment..." value={comment.comment} onChange={(e) => setComment({ [e.target.name]: e.target.value })} />
             <Send
               style={{ marginRight: "5Px", height: "18px", color: "grey" }}
+              onClick={() => handleComment(item._id)}
             />
           </CurrentUserComment>
           {showComments && (
             <CommentGroup>
-              <Comment />
-              <Comment />
+              {comments.map((comment) => (
+                <Comment comment={comment} />
+              ))}
             </CommentGroup>
           )}
         </CommentsContainer>

@@ -16,6 +16,7 @@ const cloudinary = require("cloudinary").v2;
 const multer = require("multer")
 const {CloudinaryStorage} = require("multer-storage-cloudinary")
 
+const path = require("path")
 
 
 const app = express();
@@ -56,7 +57,8 @@ app.post("/api/upload",upload.single("file"),(req,res)=>{
     }
 })
 
-
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use('/static',express.static(path.join(__dirname,'public')))
 app.use("/api/auths", authRoute)
 app.use("/api/users", userRoute)
 app.use("/api/posts", postRoute)

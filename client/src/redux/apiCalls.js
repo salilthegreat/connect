@@ -1,5 +1,4 @@
 //LOGIN CALL
-
 import { publicRequest, userRequest } from "../requestMetohd"
 import { apiCallError, apiCallStart, createPostSuccess, loginSuccess, signUpSuccess, updateUserSuccess } from "./UserSlice"
 
@@ -45,9 +44,39 @@ export const NewPost = async(dispatch,postData) =>{
     try {
         const res = await userRequest.post("/posts/create",postData)
         dispatch(createPostSuccess())
-        console.log(res)
     } catch (error) {
         console.log(error);
         dispatch(apiCallError(error.response.status))
     }
 }
+
+//DELETE A POST
+export const DeletePost = async(dispatch,postId,userId)=>{
+    try {
+        const res = await userRequest.delete(`/posts/${postId}/${userId}`);
+        console.log(res)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+//UPDATE POST
+export const UpdatePost = async(dispatch,postId,userId,description) => {
+    try {
+        const res = await userRequest.put(`/posts/updatepost/${postId}/${userId}`,description);
+        console.log(res.data)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+//CREATE A COMMENT
+export const CreateComment = async(dispatch,postId,userId,comment) => {
+    try {
+        const res = await userRequest.post(`/comments/${postId}/${userId}`,comment);
+        console.log(res)
+    } catch (error) {
+        console.log(error)
+    }
+}
+

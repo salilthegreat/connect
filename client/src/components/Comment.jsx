@@ -43,7 +43,8 @@ const Time = styled.span`
 font-weight: 300;
 font-size: 10px;
 `
-const Comment = () => {
+const Comment = ({comment}) => {
+
     return (
         <Fragment>
             <UserCommentsContainer>
@@ -55,7 +56,7 @@ const Comment = () => {
                     </User>
                 </UserComments>
                 <CommentSection>
-                    <CommentText>You have a nice build,Anna.What do you do for leg strengthning.I wanna incorporate,squats and deadlifts soon.Just building enough core strength to nail that.</CommentText>
+                    <CommentText>{comment?.comment}</CommentText>
                     <EditComment>
                         <Edit style={{ marginRight: "5Px", height: "13px", color: "grey" }} />
                         <Delete style={{ marginRight: "5Px", height: "13px", color: "grey" }} />

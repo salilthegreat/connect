@@ -5,9 +5,9 @@ const { verifyToken, verifyTokenAndAdmin, verifyTokenAndAuthorization } = requir
 const router = require("express").Router();
 
 //GET A USER
-router.get("/find/:id", verifyToken, async (req, res) => {
+router.get("/find/:userId", verifyToken, async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.userId);
         const { password, ...others } = user.toObject();
         res.status(200).json(others)
     } catch (error) {

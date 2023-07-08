@@ -117,7 +117,6 @@ const LeftBar = () => {
   const handleChange = (e) => {
     setUpdateData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
-  console.log(updateData);
   const userId = currentUser._id;
 
   const handleUpdate = (check) => {

@@ -101,7 +101,6 @@ const CreatePost = () => {
         description:post.description
     }
     const dispatch = useDispatch()
-    // const uploading = false;
 
     const handlePost = async (e) => {
         e.preventDefault();
@@ -113,7 +112,6 @@ const CreatePost = () => {
             data.append("file",file)
             try {
                 const res = await userRequest.post("/upload",data);
-                console.log(res.data.file)
                 newPost.img = res.data.file;
             } catch (error) {
                 console.log(error)
@@ -124,8 +122,6 @@ const CreatePost = () => {
         setPost({ description: "" })
         setFile(null)
     }
-    console.log(post)
-    // console.log(file)
     return (
         <Fragment>
             <MainDiv>

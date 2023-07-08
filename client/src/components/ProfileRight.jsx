@@ -18,8 +18,8 @@ const ButtonColor = styled.div`
     height: 36px;
     width: 97px;
     border-radius: 18px;
-    /* transform: translateX(${(props)=>(props.slideIndex +"px")}); */
-    transform: translateX(${props=>((props.slideIndex )+"px")});
+    /* transform: translateX(${(props)=>(props.slideindex +"px")}); */
+    transform: translateX(${props=>((props.slideindex )+"px")});
 
 `
 const FollowersButton = styled.button`
@@ -75,7 +75,7 @@ font-size: 13px;
 `
 
 const ProfileRight = () => {
-    const[slideIndex,setSlideIndex] = useState(0)
+    const[slideindex,setSlideindex] = useState(0)
     const [followers, setFollowers] = useState(true)
     const [followings, setFollowings] = useState(false)
 
@@ -83,11 +83,11 @@ const ProfileRight = () => {
         if(direction === "left"){
             setFollowers(true);
             setFollowings(false)
-            setSlideIndex(0)
+            setSlideindex(0)
         }else{
             setFollowings(true);
             setFollowers(false)
-            setSlideIndex(100)
+            setSlideindex(100)
         }
     }
 
@@ -98,7 +98,7 @@ const ProfileRight = () => {
                 <FollowButtons>
                     <FollowersButton onClick={()=>handleSwitch("left")}>Followers</FollowersButton>
                     <FollowingsButton onClick={()=>handleSwitch("right")}>Followings</FollowingsButton>
-                    <ButtonColor slideIndex={slideIndex}></ButtonColor>
+                    <ButtonColor slideindex={slideindex}></ButtonColor>
                 </FollowButtons>
                 <FollowWrapper>
 
