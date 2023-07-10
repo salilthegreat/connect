@@ -38,27 +38,7 @@ export const UpdateUser = async(dispatch,userId,updateData) =>{
     }
 }
 
-//CREATE A POST
-export const NewPost = async(dispatch,postData) =>{
-    dispatch(apiCallStart());
-    try {
-        const res = await userRequest.post("/posts/create",postData)
-        dispatch(createPostSuccess())
-    } catch (error) {
-        console.log(error);
-        dispatch(apiCallError(error.response.status))
-    }
-}
 
-//DELETE A POST
-export const DeletePost = async(dispatch,postId,userId)=>{
-    try {
-        const res = await userRequest.delete(`/posts/${postId}/${userId}`);
-        console.log(res)
-    } catch (error) {
-        console.log(error)
-    }
-}
 
 //UPDATE POST
 export const UpdatePost = async(dispatch,postId,userId,description) => {

@@ -14,7 +14,8 @@ import { userRequest } from "../requestMetohd";
 import { useDispatch, useSelector } from "react-redux";
 import { apiCallError } from "../redux/UserSlice";
 import ReactTimeAgo from 'react-time-ago'
-import { CreateComment, DeletePost, UpdatePost } from "../redux/apiCalls";
+import { CreateComment, UpdatePost } from "../redux/apiCalls";
+import { DeletePost, LikePost } from "../redux/postApiCalls";
 
 const DelteModal = styled.div`
   background-color: gray;
@@ -223,28 +224,37 @@ const Post = ({ item }) => {
     getUser();
   }, [item, dispatch])
 
+  useEffect(()=>{
+    setLiked(item?.likes.includes(currentUser._id))
+  },[item,currentUser])
+
   const handleDelte = (postId) => {
-    DeletePost(dispatch, postId, currentUser._id)
+    DeletePost(dispatch, postId, currentUser?._id)
     setDel(!del)
   }
 
   const handleUpdate = (postId) => {
-    UpdatePost(dispatch, postId, currentUser._id, description)
+    UpdatePost(dispatch, postId, currentUser?._id, description)
     setShowInput(!showInput)
   }
 
   const handleComment = (postId) => {
-    CreateComment(dispatch, postId, currentUser._id, comment)
+    CreateComment(dispatch, postId, currentUser?._id, comment)
     setComment({
       comment: ""
     })
+  }
+
+  const handleLike = (postId)=>{
+    LikePost(dispatch,postId,currentUser?._id)
+    setLiked(!liked)
   }
 
   useEffect(() => {
     const getComments = async () => {
       try {
         const res = await userRequest.get(`/comments/${item?._id}`);
-        console.log(res.data)
+        // console.log(res.data)
         setComments(res.data)
       } catch (error) {
         console.log(error)
@@ -253,7 +263,7 @@ const Post = ({ item }) => {
     getComments();
   }, [item])
 
-  console.log(comment)
+  // console.log(comment)
   return (
     <Fragment>
       <MainDiv>
@@ -261,7 +271,7 @@ const Post = ({ item }) => {
           <Ques>Are you sure?</Ques>
           <ButtonGroup>
             <KeepPost onClick={(e) => setDel(!del)} >Keep</KeepPost>
-            <DeleteButton onClick={() => handleDelte(item._id)}>Delete</DeleteButton>
+            <DeleteButton onClick={() => handleDelte(item?._id)}>Delete</DeleteButton>
           </ButtonGroup>
         </DelteModal>}
         <UserSection>
@@ -269,11 +279,11 @@ const Post = ({ item }) => {
             <ProfilePic src={currentUser?.profilePicture ? currentUser?.profilePicture : "http://localhost:5000/static/profilePic.png"} />
             <UserDetails>
               <Name>{user?.userName}</Name>
-              <Time><ReactTimeAgo date={Date.parse(item?.createdAt)} locale="en-US" /></Time>
+              <Time><ReactTimeAgo date={Date.parse(item?.createdAt) || item?.createdAt} locale="en-US" /></Time>
             </UserDetails>
           </UserSectionLeft>
           <UserSectionRight>
-            {(currentUser._id === item.userId) && <MoreVert
+            {(currentUser?._id === item?.userId) && <MoreVert
               style={{ marginRight: "5Px", height: "18px", color: "grey" }}
               onClick={(e) => setEdit(!edit)}
             />}
@@ -291,13 +301,13 @@ const Post = ({ item }) => {
             )}
           </UserSectionRight>
         </UserSection>
-        {!showInput && <Text>{item.description}</Text>}
+        {!showInput && <Text>{item?.description}</Text>}
         {showInput && (
           <InputWrapper>
             <EditInput defaultValue={item?.description} name="description" onChange={(e) => setDescription({ [e.target.name]: e.target.value })} />
             <Send
               style={{ marginRight: "5Px", height: "18px", color: "grey" }}
-              onClick={() => handleUpdate(item._id)}
+              onClick={() => handleUpdate(item?._id)}
             />
           </InputWrapper>
         )}
@@ -305,7 +315,7 @@ const Post = ({ item }) => {
           <Image src={item?.img} ></Image>
         </ImageWrapper>}
         <Bottom>
-          <BottomHolder onClick={(e) => setLiked(!liked)}>
+          <BottomHolder onClick={()=>handleLike(item?._id)}>
             {liked ? (
               <Favorite
                 style={{ marginRight: "5Px", height: "18px", color: "grey" }}
@@ -331,7 +341,7 @@ const Post = ({ item }) => {
             <Input type="text" name="comment" placeholder="Write a comment..." value={comment.comment} onChange={(e) => setComment({ [e.target.name]: e.target.value })} />
             <Send
               style={{ marginRight: "5Px", height: "18px", color: "grey" }}
-              onClick={() => handleComment(item._id)}
+              onClick={() => handleComment(item?._id)}
             />
           </CurrentUserComment>
           {showComments && (

@@ -46,7 +46,8 @@ router.get("/getfeed",verifyToken,async(req,res)=>{
         }       
         ))
        const feedPosts = myPosts.concat(...friendPosts)
-        res.status(200).json(feedPosts.sort((a,b)=>b.createdAt - a.createdAt))
+        res.status(200).json(feedPosts)
+        // res.status(200).json(feedPosts.sort((a,b)=>b.createdAt - a.createdAt))
     } catch (error) {
         res.status(500).json(error.message)
     }
@@ -71,6 +72,22 @@ router.delete("/:postId/:userId",verifyTokenAndAuthorization,async(req,res)=>{
         if(post.userId != req.params.userId) return res.status(403).json("How dare you try to delete other's post")
         await Post.findByIdAndDelete(req.params.postId);
         res.status(200).json("Post has been delted successfully")
+    } catch (error) {
+        res.status(500).json(error.message)
+    }
+})
+
+//LIKE/UNLIKE A POST
+router.put("/like/:postId",verifyToken,async(req,res)=>{
+    try {
+        const post = await Post.findById(req.params.postId);
+        if(post.likes.includes(req.user.userId)){
+            await post.updateOne({$pull:{likes:req.user.userId}})
+            return res.status(201).json("disliked")
+        }else{
+            await post.updateOne({$push:{likes:req.user.userId}});
+            res.status(201).json("liked")
+        }
     } catch (error) {
         res.status(500).json(error.message)
     }

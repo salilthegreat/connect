@@ -36,13 +36,9 @@ export const UserSlice = createSlice({
             state.currentUser= action.payload;
             state.loading = false;
             state.error = false;
-        },
-        createPostSuccess:(state)=>{
-            state.error = false;
-            state.loading = false;
         }
     }
 });
 
-export const { apiCallStart, loginSuccess, apiCallError, signUpSuccess, logOut, refreshLogin,updateUserSuccess,createPostSuccess } = UserSlice.actions;
+export const { apiCallStart, loginSuccess, apiCallError, signUpSuccess, logOut, refreshLogin,updateUserSuccess } = UserSlice.actions;
 export default UserSlice.reducer

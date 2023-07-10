@@ -1,30 +1,21 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, } from 'react'
 import CreatePost from './CreatePost'
-import Post from './Post'
-import { apiCallError } from '../redux/UserSlice'
-import { userRequest } from '../requestMetohd'
+import { useDispatch, useSelector } from 'react-redux'
+import { FeedPosts } from '../redux/postApiCalls'
+import Post from "./Post"
 
 const Posts = () => {
-    const [posts,setPosts] = useState([])
-    const[fetching,setFetching] = useState(false)
+    // const [posts,setPosts] = useState([])
+    const dispatch = useDispatch();
+    const posts = useSelector((state)=>state.post.posts)
     useEffect(() => {
-        const FeedPost = async () => {
-            setFetching(true)
-            try {
-                const res = await userRequest.get("/posts/getfeed");
-                setPosts(res.data)
-            } catch (error) {
-                apiCallError(error.response.status)
-            }
-            setFetching(false)
-        };
-        FeedPost();
-    }, []);
+        FeedPosts(dispatch)
+    }, [dispatch]);
     return (
         <Fragment>
             <CreatePost />
-            {fetching ? "Fetching" : posts?.map((item)=>(
-            <Post item={item} key={item._id}/>
+            { posts?.map((item)=>(
+            <Post item={item} key={item?._id}/>
             ))}
         </Fragment>
     )

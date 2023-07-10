@@ -1,7 +1,7 @@
 import { Cancel, GifBox, Image, VideoLibrary } from '@mui/icons-material'
 import React, { Fragment, useState } from 'react'
 import { styled } from 'styled-components'
-import { NewPost } from '../redux/apiCalls'
+import { NewPost } from '../redux/postApiCalls'
 import { useDispatch } from 'react-redux'
 import {  userRequest } from '../requestMetohd'
 
