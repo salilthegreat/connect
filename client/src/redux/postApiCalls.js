@@ -1,7 +1,8 @@
 //FETCH ALL POSTS
 
 import { userRequest } from "../requestMetohd";
-import { createPostSuccess, deletePost, fetchingPostSuccess, postApiCallStart, postDisliked, postLiked } from "./PostSlice"
+import { createPostSuccess, deletePost, fetchingPostSuccess, postApiCallStart, postDisliked, postLiked, updatePost } from "./PostSlice"
+import { apiCallStart } from "./UserSlice";
 
 
 export const FeedPosts = async(dispatch) =>{
@@ -24,6 +25,17 @@ export const NewPost = async(dispatch,postData) =>{
     } catch (error) {
         console.log(error);
         // dispatch(apiCallError(error.response.status))
+    }
+}
+
+//UPDATE POST
+export const UpdatePost = async(dispatch,postId,userId,description) => {
+    dispatch(apiCallStart())
+    try {
+        const res = await userRequest.put(`/posts/updatepost/${postId}/${userId}`,description);
+        dispatch(updatePost({postId,updatedPost:res.data}))
+    } catch (error) {
+        console.log(error)
     }
 }
 

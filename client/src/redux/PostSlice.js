@@ -42,10 +42,15 @@ export const PostSlice = createSlice({
             state.error = false;
             state.fetching = false;
             state.posts[state.posts.findIndex((item)=>item._id===action.payload.postId)].likes.pop( action.payload.userId)
+        },
+        updatePost:(state,action)=>{
+            state.error = false;
+            state.fetching = false;
+            state.posts[state.posts.findIndex((item)=>item._id === action.payload.postId)]=action.payload.updatedPost
         }
     }
 })
 
-export const {postApiCallStart,postApiCallError,fetchingPostSuccess,createPostSuccess,deletePost,postLiked,postDisliked} = PostSlice.actions;
+export const {postApiCallStart,postApiCallError,fetchingPostSuccess,createPostSuccess,deletePost,postLiked,postDisliked,updatePost} = PostSlice.actions;
 
 export default PostSlice.reducer

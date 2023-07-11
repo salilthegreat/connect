@@ -14,8 +14,8 @@ import { userRequest } from "../requestMetohd";
 import { useDispatch, useSelector } from "react-redux";
 import { apiCallError } from "../redux/UserSlice";
 import ReactTimeAgo from 'react-time-ago'
-import { CreateComment, UpdatePost } from "../redux/apiCalls";
-import { DeletePost, LikePost } from "../redux/postApiCalls";
+import { CreateComment } from "../redux/apiCalls";
+import { DeletePost, LikePost, UpdatePost } from "../redux/postApiCalls";
 
 const DelteModal = styled.div`
   background-color: gray;
@@ -307,7 +307,7 @@ const Post = ({ item }) => {
             <EditInput defaultValue={item?.description} name="description" onChange={(e) => setDescription({ [e.target.name]: e.target.value })} />
             <Send
               style={{ marginRight: "5Px", height: "18px", color: "grey" }}
-              onClick={() => handleUpdate(item?._id)}
+              onClick={() => handleUpdate(item._id)}
             />
           </InputWrapper>
         )}

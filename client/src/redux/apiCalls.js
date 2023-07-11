@@ -1,6 +1,6 @@
 //LOGIN CALL
 import { publicRequest, userRequest } from "../requestMetohd"
-import { apiCallError, apiCallStart, createPostSuccess, loginSuccess, signUpSuccess, updateUserSuccess } from "./UserSlice"
+import { apiCallError, apiCallStart, loginSuccess, signUpSuccess, updateUserSuccess } from "./UserSlice"
 
 //LOGIN CALL
 export const Login =async (dispatch,userCredentials)=>{
@@ -39,16 +39,6 @@ export const UpdateUser = async(dispatch,userId,updateData) =>{
 }
 
 
-
-//UPDATE POST
-export const UpdatePost = async(dispatch,postId,userId,description) => {
-    try {
-        const res = await userRequest.put(`/posts/updatepost/${postId}/${userId}`,description);
-        console.log(res.data)
-    } catch (error) {
-        console.log(error)
-    }
-}
 
 //CREATE A COMMENT
 export const CreateComment = async(dispatch,postId,userId,comment) => {
