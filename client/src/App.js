@@ -20,7 +20,7 @@ function App() {
     <Route path="/" element={<LogIn/>}/>
     <Route path="/signup" element={<Signup/>}/>
     <Route path="/feed" element={<Feed/>}/>
-    <Route path="/profile" element={<Profile/>}/>
+    <Route path="/profile/:userId" element={<Profile/>}/>
     <Route path="/message" element={<Message/>}/>
     </Routes>
     </BrowserRouter>

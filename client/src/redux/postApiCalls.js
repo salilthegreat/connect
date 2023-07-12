@@ -1,7 +1,7 @@
 //FETCH ALL POSTS
 
 import { userRequest } from "../requestMetohd";
-import { createPostSuccess, deletePost, fetchingPostSuccess, postApiCallStart, postDisliked, postLiked, updatePost } from "./PostSlice"
+import { createComment, createPostSuccess, deleteComment, deletePost, fetchingPostSuccess, postApiCallStart, postDisliked, postLiked, updatePost } from "./PostSlice"
 import { apiCallStart } from "./UserSlice";
 
 
@@ -43,9 +43,8 @@ export const UpdatePost = async(dispatch,postId,userId,description) => {
 export const DeletePost = async(dispatch,postId,userId)=>{
     dispatch(postApiCallStart)
     try {
-        const res = await userRequest.delete(`/posts/${postId}/${userId}`);
+         await userRequest.delete(`/posts/${postId}/${userId}`);
         dispatch(deletePost(postId))
-        console.log(res)
     } catch (error) {
         console.log(error)
     }
@@ -61,6 +60,39 @@ export const LikePost = async(dispatch,postId,userId) =>{
         }else{
             dispatch(postDisliked({postId:postId,userId:userId}))
         }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+//CREATE A COMMENT
+export const CreateComment = async(dispatch,postId,userId,comment) => {
+    dispatch(apiCallStart);
+    try {
+        const res = await userRequest.post(`/comments/${postId}/${userId}`,comment);
+        dispatch(createComment({postId,commentId:res.data._id}))
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+//EDIT A COMMENT
+export const UpdateComment = async(dispatch,data,newComment)=>{
+    dispatch(apiCallStart);
+    try {
+         await userRequest.put(`/comments/${data.commentId}/${data.userId}`,{comment:newComment});
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+//DELETE A COMMENT
+export const DeleteComment = async(dispatch,data)=>{
+    dispatch(apiCallStart);
+    try {
+         await userRequest.delete(`/comments/${data.commentId}/${data.userId}`);
+        dispatch(deleteComment(data))
     } catch (error) {
         console.log(error)
     }

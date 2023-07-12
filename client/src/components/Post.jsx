@@ -14,8 +14,9 @@ import { userRequest } from "../requestMetohd";
 import { useDispatch, useSelector } from "react-redux";
 import { apiCallError } from "../redux/UserSlice";
 import ReactTimeAgo from 'react-time-ago'
-import { CreateComment } from "../redux/apiCalls";
+import { CreateComment } from "../redux/postApiCalls";
 import { DeletePost, LikePost, UpdatePost } from "../redux/postApiCalls";
+import { useNavigate } from "react-router-dom";
 
 const DelteModal = styled.div`
   background-color: gray;
@@ -205,11 +206,12 @@ const Post = ({ item }) => {
   const [del, setDel] = useState(false);
   const [user, setUser] = useState({})
   const dispatch = useDispatch();
-  const [description, setDescription] = useState({})
+  const [description, setDescription] = useState({description:item?.description})
   const [comment, setComment] = useState({
     comment: ""
   })
   const [comments, setComments] = useState([])
+  const navigate = useNavigate()
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -254,16 +256,14 @@ const Post = ({ item }) => {
     const getComments = async () => {
       try {
         const res = await userRequest.get(`/comments/${item?._id}`);
-        // console.log(res.data)
         setComments(res.data)
       } catch (error) {
         console.log(error)
       }
     }
     getComments();
-  }, [item])
+  }, [item,showComments])
 
-  // console.log(comment)
   return (
     <Fragment>
       <MainDiv>
@@ -276,9 +276,9 @@ const Post = ({ item }) => {
         </DelteModal>}
         <UserSection>
           <UserSectionLeft>
-            <ProfilePic src={currentUser?.profilePicture ? currentUser?.profilePicture : "http://localhost:5000/static/profilePic.png"} />
+            <ProfilePic src={currentUser?.profilePicture ? currentUser?.profilePicture : "http://localhost:5000/static/profilePic.png"} onClick={()=>navigate(`/profile/${user._id}`)} />
             <UserDetails>
-              <Name>{user?.userName}</Name>
+              <Name onClick={()=>navigate(`/profile/${user._id}`)}>{user?.userName}</Name>
               <Time><ReactTimeAgo date={Date.parse(item?.createdAt) || item?.createdAt} locale="en-US" /></Time>
             </UserDetails>
           </UserSectionLeft>
@@ -301,7 +301,7 @@ const Post = ({ item }) => {
             )}
           </UserSectionRight>
         </UserSection>
-        {!showInput && <Text>{item?.description}</Text>}
+        {!showInput && <Text>{description?.description}</Text>}
         {showInput && (
           <InputWrapper>
             <EditInput defaultValue={item?.description} name="description" onChange={(e) => setDescription({ [e.target.name]: e.target.value })} />
@@ -331,7 +331,7 @@ const Post = ({ item }) => {
             <InsertComment
               style={{ marginRight: "5Px", height: "18px", color: "grey" }}
             />
-            <Counts>{item?.comments.length} comments</Counts>
+            <Counts>{comments.length} comments</Counts>
           </BottomHolder>
         </Bottom>
         <Hr />

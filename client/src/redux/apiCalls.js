@@ -40,13 +40,3 @@ export const UpdateUser = async(dispatch,userId,updateData) =>{
 
 
 
-//CREATE A COMMENT
-export const CreateComment = async(dispatch,postId,userId,comment) => {
-    try {
-        const res = await userRequest.post(`/comments/${postId}/${userId}`,comment);
-        console.log(res)
-    } catch (error) {
-        console.log(error)
-    }
-}
-

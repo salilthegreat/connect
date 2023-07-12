@@ -5,6 +5,7 @@ import LeftBar from "../components/LeftBar";
 import Middle from "../components/MIddle";
 import Rightbar from "../components/Rightbar";
 import { Add, LocationOn, Message } from "@mui/icons-material";
+import { useSelector } from "react-redux";
 
 const Container = styled.div`
   display: flex;
@@ -87,6 +88,7 @@ const ProfileRightBottom = styled.div`
 `;
 
 const Profile = () => {
+  const {currentUser} = useSelector((state)=>state.user)
   return (
     <Fragment>
       <Navbar />
@@ -99,8 +101,8 @@ const Profile = () => {
               <ProfilePic src="https://images.unsplash.com/photo-1485396003708-e7a7ad32484f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2117&q=80" />
             </UserImages>
             <UserDetails>
-              <FullName>Jessica Jones</FullName>
-              <UserName>@jessicajones</UserName>
+              <FullName>{currentUser?.firstName + " " + currentUser?.lastName}</FullName>
+              <UserName>@{currentUser?.userName}</UserName>
               <UserProfession>Product Designer</UserProfession>
               <UserLocation><LocationOn style={{height:"14px",color:"gray"}}/>Colorado, United States</UserLocation>
               <UserButtons>

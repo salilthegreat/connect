@@ -12,8 +12,10 @@ router.post("/:postId/:userId", verifyToken, async (req, res) => {
             userId:req.params.userId,
             comment:req.body.comment
         });
-        await newComment.save();
-        res.status(200).json(newComment)
+        const post = await Post.findById(req.params.postId)
+        const savedComment = await newComment.save();
+        await post.updateOne({$push:{comments:savedComment._id}})
+        res.status(200).json(savedComment)
     } catch (error) {
         res.status(500).json(error.message)
     }
@@ -51,7 +53,7 @@ router.delete("/:commentId/:userId",verifyToken,async(req,res)=>{
         const post = await Post.findById(comment.postId);
         if(comment.userId== req.params.userId || post.userId ==req.params.userId){ //Both user and owner of the post can delete a comment
             await Comment.findByIdAndDelete(req.params.commentId);
-            res.status(200).json("Comment has been deleted successfully")
+            res.status(200).json("Deleted")
         }
         else return res.status(403).json("How dare you try to delete other's comment,you homewrecker!")
     } catch (error) {

@@ -148,7 +148,7 @@ const LeftBar = () => {
 
           <MiddleDiv>
             <Link to={"/feed"} style={{ textDecoration: "none" }}> <LinkHolder><Home style={{ height: "20px", color: "gray" }} />Home</LinkHolder></Link>
-            <Link to={"/profile"} style={{ textDecoration: "none" }}><LinkHolder><Person style={{ height: "20px", color: "gray" }} />Profile</LinkHolder></Link>
+            <Link to={`/profile/${currentUser._id}`} style={{ textDecoration: "none" }}><LinkHolder><Person style={{ height: "20px", color: "gray" }} />Profile</LinkHolder></Link>
             <Link to={"/"} style={{ textDecoration: "none" }}><LinkHolder><Notifications style={{ height: "20px", color: "gray" }} />Notifications</LinkHolder></Link>
             <Link to={"/message"} style={{ textDecoration: "none" }}><LinkHolder><Message style={{ height: "20px", color: "gray" }} />Messages</LinkHolder></Link>
           </MiddleDiv>
