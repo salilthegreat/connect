@@ -1,6 +1,11 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { styled } from 'styled-components'
 import { SearchOutlined } from '@mui/icons-material'
+import { useDispatch, useSelector } from 'react-redux'
+import { apiCallStart } from '../redux/UserSlice'
+import { userRequest } from '../requestMetohd'
+import {Follow} from "../redux/apiCalls"
+import { useNavigate } from 'react-router-dom'
 
 const Wrapper = styled.div`
     padding: 20px;
@@ -49,6 +54,7 @@ height: 40px;
 width: 40px;
 border-radius: 50%;
 object-fit: cover;
+cursor: pointer;
 `
 const Details = styled.div`
 display: flex;
@@ -58,17 +64,19 @@ align-items: center;
 const UserName = styled.span`
 font-weight: 400;
 font-size: 13px;
+cursor: pointer;
 `
 const UserLocation = styled.span`
 font-size: 10px;
 font-weight: 200;
 `
-const FollowButton = styled.button`
+const FollowButton = styled.a`
   padding: 5px;
   border-radius: 5px;
   border: none;
   font-weight: 300;
   font-size: 10px;
+  cursor: pointer;
 `
 
 const ShowMoreButton = styled.button`
@@ -81,10 +89,49 @@ const ShowMoreButton = styled.button`
   width: 90%;
   display: block;
   margin: 0 auto;
+  cursor: pointer;
   
 `
 
 const FeedRightbar = () => {
+  const {currentUser} = useSelector((state)=>state.user)
+  const [suggestion,setSuggestion] = useState([])
+  const navigate = useNavigate()
+  const [page,setPage] = useState(1)
+  // const [following,setFollowing] = useState(false)
+
+    const dispatch = useDispatch()
+
+    useEffect(()=>{
+         const Suggestions = async()=>{
+            dispatch(apiCallStart());
+            try {
+                const res = await userRequest.get(`/users/findsorted?page=${1}&limit=5`);
+                setSuggestion(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        
+        }
+        Suggestions()
+      },[])
+
+      const handleFollow = (userId) => {
+        Follow(dispatch,userId)
+      }
+
+      const handleShowMore = async() =>{
+
+          dispatch(apiCallStart);
+          try {
+            const res = await userRequest.get(`/users/findsorted?page=${page + 1}&limit=5`)
+            setSuggestion(res.data)
+            setPage(page + 1)
+          } catch (error) {
+            console.log(error)
+          }
+      }
+
     return (
         <Fragment>
             <Wrapper>
@@ -96,56 +143,18 @@ const FeedRightbar = () => {
                     <SearchOutlined style={{ height: '22px', color: "gray", position: "absolute", right: "10px", }} />
                 </SearchWrapper>
                 <UserSection>
+                    {suggestion.map((friend)=>(
                     <UserProfile>
-                        <ProfilePic src='https://images.unsplash.com/photo-1616769364512-1e50e8266907?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=798&q=80' />
+                        <ProfilePic src={friend?.profilePicture ? friend.profilePicture : "http://localhost:5000/static/profilePic.png" } onClick={()=>navigate(`/profile/${friend._id}`)} />
                         <Details>
-                            <UserName>Abigail Colon</UserName>
+                            <UserName onClick={()=>navigate(`/profile/${friend._id}`)}>{friend.userName}</UserName>
                             <UserLocation>Manchestar,Portugal</UserLocation>
                         </Details>
-                        <FollowButton>Follow</FollowButton>
+                        <FollowButton onClick={()=>handleFollow(friend._id)}>{currentUser?.followings.includes(friend._id) ? "Unfollow" :"Follow"}</FollowButton>
                     </UserProfile>
-                    <UserProfile>
-                        <ProfilePic src='https://images.unsplash.com/photo-1616769364512-1e50e8266907?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=798&q=80' />
-                        <Details>
-                            <UserName>Abigail Colon</UserName>
-                            <UserLocation>Manchestar,Portugal</UserLocation>
-                        </Details>
-                        <FollowButton>Follow</FollowButton>
-                    </UserProfile>
-                    <UserProfile>
-                        <ProfilePic src='https://images.unsplash.com/photo-1616769364512-1e50e8266907?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=798&q=80' />
-                        <Details>
-                            <UserName>Abigail Colon</UserName>
-                            <UserLocation>Manchestar,Portugal</UserLocation>
-                        </Details>
-                        <FollowButton>Follow</FollowButton>
-                    </UserProfile>
-                    <UserProfile>
-                        <ProfilePic src='https://images.unsplash.com/photo-1616769364512-1e50e8266907?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=798&q=80' />
-                        <Details>
-                            <UserName>Abigail Colon</UserName>
-                            <UserLocation>Manchestar,Portugal</UserLocation>
-                        </Details>
-                        <FollowButton>Follow</FollowButton>
-                    </UserProfile>
-                    <UserProfile>
-                        <ProfilePic src='https://images.unsplash.com/photo-1616769364512-1e50e8266907?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=798&q=80' />
-                        <Details>
-                            <UserName>Abigail Colon</UserName>
-                            <UserLocation>Manchestar,Portugal</UserLocation>
-                        </Details>
-                        <FollowButton>Follow</FollowButton>
-                    </UserProfile>
-                    <UserProfile>
-                        <ProfilePic src='https://images.unsplash.com/photo-1616769364512-1e50e8266907?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=798&q=80' />
-                        <Details>
-                            <UserName>Abigail Colon</UserName>
-                            <UserLocation>Manchestar,Portugal</UserLocation>
-                        </Details>
-                        <FollowButton>Follow</FollowButton>
-                    </UserProfile>
+                    ))}
                 </UserSection>
-                <ShowMoreButton>Show More</ShowMoreButton>
+                <ShowMoreButton onClick={handleShowMore}>Show More</ShowMoreButton>
             </Wrapper>
         </Fragment>
     )

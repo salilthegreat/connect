@@ -1,6 +1,6 @@
 //LOGIN CALL
 import { publicRequest, userRequest } from "../requestMetohd"
-import { apiCallError, apiCallStart, loginSuccess, signUpSuccess, updateUserSuccess } from "./UserSlice"
+import { apiCallError, apiCallStart, followedUser, loginSuccess, signUpSuccess, unfollowedUser, updateUserSuccess } from "./UserSlice"
 
 //LOGIN CALL
 export const Login =async (dispatch,userCredentials)=>{
@@ -39,4 +39,20 @@ export const UpdateUser = async(dispatch,userId,updateData) =>{
 }
 
 
+//FOLLOW UNFOLLOW USER
+
+export const Follow = async (dispatch,userId) =>{
+    dispatch(apiCallStart());
+    try {
+        const res = await userRequest.put(`/users/follow/${userId}`);
+        console.log(res.data)
+        if(res.data === "Followed"){
+            dispatch(followedUser(userId))
+        }else{
+            dispatch(unfollowedUser(userId))
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
 

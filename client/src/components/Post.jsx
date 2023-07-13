@@ -198,20 +198,22 @@ const CommentGroup = styled.div`
 `;
 
 const Post = ({ item }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
   const { currentUser } = useSelector((state) => state.user)
+
   const [liked, setLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [edit, setEdit] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [del, setDel] = useState(false);
   const [user, setUser] = useState({})
-  const dispatch = useDispatch();
   const [description, setDescription] = useState({description:item?.description})
   const [comment, setComment] = useState({
     comment: ""
   })
   const [comments, setComments] = useState([])
-  const navigate = useNavigate()
+
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -230,6 +232,20 @@ const Post = ({ item }) => {
     setLiked(item?.likes.includes(currentUser._id))
   },[item,currentUser])
 
+  
+  useEffect(() => {
+    const getComments = async () => {
+      try {
+        const res = await userRequest.get(`/comments/${item?._id}`);
+        setComments(res.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    getComments();
+  }, [item,showComments])
+  
+  
   const handleDelte = (postId) => {
     DeletePost(dispatch, postId, currentUser?._id)
     setDel(!del)
@@ -251,18 +267,6 @@ const Post = ({ item }) => {
     LikePost(dispatch,postId,currentUser?._id)
     setLiked(!liked)
   }
-
-  useEffect(() => {
-    const getComments = async () => {
-      try {
-        const res = await userRequest.get(`/comments/${item?._id}`);
-        setComments(res.data)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    getComments();
-  }, [item,showComments])
 
   return (
     <Fragment>

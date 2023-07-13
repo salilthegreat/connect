@@ -36,9 +36,19 @@ export const UserSlice = createSlice({
             state.currentUser= action.payload;
             state.loading = false;
             state.error = false;
+        },
+        followedUser:(state,action)=>{
+            state.loading = false;
+            state.error = false;
+            state.currentUser.followings.push(action.payload)
+        },
+        unfollowedUser:(state,action)=>{
+            state.loading = false;
+            state.error = false;
+            state.currentUser.followings.splice(state.currentUser.followings.findIndex((item)=>item === action.payload),1)
         }
     }
 });
 
-export const { apiCallStart, loginSuccess, apiCallError, signUpSuccess, logOut, refreshLogin,updateUserSuccess } = UserSlice.actions;
+export const { apiCallStart, loginSuccess, apiCallError, signUpSuccess, logOut, refreshLogin,updateUserSuccess,followedUser,unfollowedUser } = UserSlice.actions;
 export default UserSlice.reducer

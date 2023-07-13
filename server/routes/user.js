@@ -73,11 +73,11 @@ router.put("/follow/:userId", verifyToken,async (req, res) => {
         if (secondUser.followers.includes(req.user.userId)) {
              await secondUser.updateOne({$pull:{followers:req.user.userId}})
              await currentUser.updateOne({$pull:{followings:req.params.userId}})
-            return res.status(200).json("User has been unfollowed")
+            return res.status(200).json("Unfollowed")
         } else {
             await secondUser.updateOne({$push:{followers:req.user.userId}});
             await currentUser.updateOne({$push:{followings:req.params.userId}});
-            return res.status(200).json("User has been followed")
+            return res.status(200).json("Followed")
         }
     } catch (error) {
         res.status(500).json(error.message)
