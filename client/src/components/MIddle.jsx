@@ -10,12 +10,12 @@ const Wrapper = styled.div`
     
 `
 
-const Middle = () => {
+const Middle = ({profile}) => {
   return (
     <Fragment>
         <Container>
             <Wrapper>
-            <Posts/>
+            <Posts profile={profile}/>
             </Wrapper>
         </Container>
     </Fragment>

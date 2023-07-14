@@ -68,6 +68,7 @@ const Comment = ({ comment }) => {
     const [user, setUser] = useState({})
     const [newComment, setNewComment] = useState(comment?.comment)
     const [edit, setEdit] = useState(false)
+    const [post,setPost] = useState({})
 
     useEffect(() => {
         const getUser = async () => {
@@ -83,6 +84,20 @@ const Comment = ({ comment }) => {
         getUser();
     }, [comment, dispatch])
 
+    useEffect(()=>{
+        const getPost = async()=>{
+            dispatch(apiCallStart);
+            try {
+                const res = await userRequest.get(`/posts/getone/${comment?.postId}`)
+                setPost(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        } 
+        getPost()
+            
+    },[comment,dispatch])
+
     const data = {
         commentId:comment?._id,
         userId:currentUser?._id,
@@ -97,6 +112,7 @@ const Comment = ({ comment }) => {
     const handleDelete = () => {
         DeleteComment(dispatch,data)
     }
+    console.log(currentUser?._id,post?.userId)
     
     return (
         <Fragment>
@@ -104,7 +120,7 @@ const Comment = ({ comment }) => {
                 <UserComments>
                     <ProfileComment src={user?.profilePicture ? user.profilePicture : "http://localhost:5000/static/profilePic.png"} onClick={() => navigate(`/profile/${user._id}`)} />
                     <User>
-                        <UserName onClick={() => navigate(`/profile/${user._id}`)}>{user.firstName + " " + user.lastName}</UserName>
+                        <UserName onClick={() => navigate(`/profile/${user?._id}`)}>{user?.firstName + " " + user?.lastName}</UserName>
                         {/* <Time>1 minute ago</Time> */}
                         <Time><ReactTimeAgo date={Date.parse(comment?.createdAt) || comment?.createdAt} locale="en-US" /></Time>
 
@@ -118,8 +134,8 @@ const Comment = ({ comment }) => {
                         <Send style={{ marginRight: "5Px", height: "13px", color: "grey" }} onClick={handleEdit}></Send>
                     </EditCommentWrapper>}
                     <EditComment>
-                        {(currentUser._id === user._id) && <Edit style={{ marginRight: "5Px", height: "13px", color: "grey" }} onClick={() => setEdit(!edit)} />}
-                    {(currentUser._id === user._id || currentUser._id ===comment.userId) &&     <Delete style={{ marginRight: "5Px", height: "13px", color: "grey" }} onClick= {handleDelete}/>}
+                        {(currentUser?._id === user?._id) && <Edit style={{ marginRight: "5Px", height: "13px", color: "grey" }} onClick={() => setEdit(!edit)} />}
+                    {(currentUser?._id === post?.userId?._id || currentUser?._id === comment?.userId) &&     <Delete style={{ marginRight: "5Px", height: "13px", color: "grey" }} onClick= {handleDelete}/>}
                     </EditComment>
                 </CommentSection>
             </UserCommentsContainer>

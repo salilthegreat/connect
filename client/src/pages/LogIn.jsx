@@ -1,11 +1,11 @@
 import { Fragment, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import styled from "styled-components"
 import { Login } from "../redux/apiCalls"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { apiCallStart, refreshLogin } from "../redux/UserSlice"
+import {  refreshLogin } from "../redux/UserSlice"
 
 
 const Navbar = styled.nav`
@@ -136,7 +136,6 @@ const Span = styled.span`
 const LogIn = () => {
 
   const dispatch = useDispatch();
-  const navigate = useNavigate()
 
   const {currentUser,loading,error} = useSelector((state)=>state.user)
 
@@ -154,13 +153,16 @@ const LogIn = () => {
 
   useEffect(()=>{
     currentUser && toast("Login Successful")
-    currentUser && navigate("/feed")
+    currentUser && setTimeout(()=>{
+      window.location.reload()
+    })
   },[currentUser])
 
   const handleLogin =  (e) => {
     e.preventDefault()
     Login(dispatch,userCredentials);
   }
+  console.log(currentUser)
 
   return (
     <Fragment>

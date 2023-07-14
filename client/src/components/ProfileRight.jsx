@@ -92,7 +92,7 @@ const ProfileRight = ({ user }) => {
         }
     }
 
-    console.log(user)
+    // console.log(user)
     return (
         <Fragment>
             <Wrapper>

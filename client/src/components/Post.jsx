@@ -229,7 +229,7 @@ const Post = ({ item }) => {
   }, [item, dispatch])
 
   useEffect(()=>{
-    setLiked(item?.likes.includes(currentUser._id))
+    setLiked(item?.likes.includes(currentUser?._id))
   },[item,currentUser])
 
   

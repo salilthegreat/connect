@@ -114,9 +114,12 @@ const Navbar = () => {
     const {currentUser} = useSelector((state)=>state.user)
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const handleLogout = () =>{
+    const handleLogout = (e) =>{
+        e.preventDefault()
         dispatch(logOut());
+        localStorage.clear("persist:root")
         navigate("/")
+        window.location.reload()
     }
   return (
     <Fragment>
@@ -126,8 +129,8 @@ const Navbar = () => {
                 <Logo src='https://cdn.pixabay.com/photo/2014/04/09/17/48/man-320276_1280.png'></Logo>
             </LeftNav>
             <MiddleNav>
-            <Link to={"/feed"} style={{textDecoration:"none"}}><LinkWrapper><Home style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Home</LinkWrapper></Link>
-                <Link to={`/profile/${currentUser._id}`} style={{textDecoration:"none"}}><LinkWrapper><Person style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Profile</LinkWrapper></Link>
+            <Link to={"/"} style={{textDecoration:"none"}}><LinkWrapper><Home style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Home</LinkWrapper></Link>
+                <Link to={`/profile/${currentUser?._id}`} style={{textDecoration:"none"}}><LinkWrapper><Person style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Profile</LinkWrapper></Link>
                 <Link to={"/"} style={{textDecoration:"none"}}><LinkWrapper><Notifications style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Notifications<Badges>11</Badges></LinkWrapper></Link>
                 <Link to={"/message"} style={{textDecoration:"none"}}><LinkWrapper><Message style={{marginRight:"5Px",height:"18px",color:"grey"}}/>Messages<Badges>3</Badges></LinkWrapper></Link>
             </MiddleNav>

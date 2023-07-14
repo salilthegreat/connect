@@ -117,7 +117,7 @@ const LeftBar = () => {
   const handleChange = (e) => {
     setUpdateData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
-  const userId = currentUser._id;
+  const userId = currentUser?._id;
 
   const handleUpdate = (check) => {
     UpdateUser(dispatch,userId,updateData)
@@ -139,7 +139,7 @@ const LeftBar = () => {
             <UserImg src='https://images.unsplash.com/photo-1602442787305-decbd65be507?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80' />
             <UserDetails>
               <Username>{currentUser?.firstName + " " + currentUser?.lastName}</Username>
-              <Location>{(currentUser.currentCity) && currentUser?.currentCity},{(currentUser.currentCity) && currentUser?.country}</Location>
+              <Location>{(currentUser?.currentCity) && currentUser?.currentCity},{(currentUser?.currentCity) && currentUser?.country}</Location>
             </UserDetails>
             <UpdateProfile>
               <Settings style={{ color: "gray", fontSize: "18px" }} />
@@ -147,8 +147,8 @@ const LeftBar = () => {
           </TopDiv>
 
           <MiddleDiv>
-            <Link to={"/feed"} style={{ textDecoration: "none" }}> <LinkHolder><Home style={{ height: "20px", color: "gray" }} />Home</LinkHolder></Link>
-            <Link to={`/profile/${currentUser._id}`} style={{ textDecoration: "none" }}><LinkHolder><Person style={{ height: "20px", color: "gray" }} />Profile</LinkHolder></Link>
+            <Link to={"/"} style={{ textDecoration: "none" }}> <LinkHolder><Home style={{ height: "20px", color: "gray" }} />Home</LinkHolder></Link>
+            <Link to={`/profile/${currentUser?._id}`} style={{ textDecoration: "none" }}><LinkHolder><Person style={{ height: "20px", color: "gray" }} />Profile</LinkHolder></Link>
             <Link to={"/"} style={{ textDecoration: "none" }}><LinkHolder><Notifications style={{ height: "20px", color: "gray" }} />Notifications</LinkHolder></Link>
             <Link to={"/message"} style={{ textDecoration: "none" }}><LinkHolder><Message style={{ height: "20px", color: "gray" }} />Messages</LinkHolder></Link>
           </MiddleDiv>

@@ -5,7 +5,7 @@ import LeftBar from "../components/LeftBar";
 import Middle from "../components/MIddle";
 import Rightbar from "../components/Rightbar";
 import { Add, LocationOn, Message } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { userRequest } from "../requestMetohd";
 import { apiCallStart } from "../redux/UserSlice";
@@ -93,7 +93,6 @@ const ProfileRightBottom = styled.div`
 const Profile = () => {
   const params = useParams()
   const dispatch = useDispatch()
-  const {currentUser} = useSelector((state)=>state.user)
   const [user,setUser] = useState({})
 
   useEffect(()=>{
@@ -101,14 +100,14 @@ const Profile = () => {
       dispatch(apiCallStart());
       try {
           const res = await userRequest.get(`/users/find/${params.userId}`);
-          console.log(res.data)
           setUser(res.data)
       } catch (error) {
           console.log(error)
       }
   }
   GetUser();
-  },[params])
+  },[params,dispatch])
+  // console.log(JSON.parse(JSON.parse(localStorage.getItem("persist:root")).user).currentUser.accessToken)
   return (
     <Fragment>
       <Navbar />
@@ -132,7 +131,7 @@ const Profile = () => {
             </UserDetails>
           </ProfileRightTop>
           <ProfileRightBottom>
-            <Middle />
+            <Middle profile= {true}/>
             <Rightbar profile="profile" user={user}/>
           </ProfileRightBottom>
         </ProfileRight>

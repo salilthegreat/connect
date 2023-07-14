@@ -32,7 +32,6 @@ const User = ({userId}) => {
             dispatch(apiCallStart())
             try {
                 const res = await userRequest.get(`/users/find/${userId}`);
-                console.log(res.data)
                 setUser(res.data)
             } catch (error) {
                 console.log(error)
@@ -40,7 +39,6 @@ const User = ({userId}) => {
         }
         GetUser()
     },[userId,dispatch])
-    console.log(userId)
     return (
         <>
             <Users>

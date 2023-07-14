@@ -14,12 +14,13 @@ TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
 function App() {
+  const user = localStorage.getItem("persist:root") ? JSON.parse(JSON.parse(localStorage.getItem("persist:root")).user)?.currentUser : null
   return (
     <BrowserRouter>
     <Routes>
-    <Route path="/" element={<LogIn/>}/>
+    <Route path="/" element={user ? <Feed/> : <LogIn/>}/>
     <Route path="/signup" element={<Signup/>}/>
-    <Route path="/feed" element={<Feed/>}/>
+    {/* <Route path="/feed" element={}/> */}
     <Route path="/profile/:userId" element={<Profile/>}/>
     <Route path="/message" element={<Message/>}/>
     </Routes>
