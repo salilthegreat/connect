@@ -10,11 +10,11 @@ const Container = styled.div`
 `
 
 
-const Rightbar = ({ profile }) => {
+const Rightbar = ({ profile,user }) => {
   return (
     <Fragment>
       {profile ? <Container>
-        <ProfileRight />
+        <ProfileRight user={user} />
       </Container> :
         <Container>
           <FeedRightbar />

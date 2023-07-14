@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react'
 import { styled } from 'styled-components'
+import User from './User'
 
 const Wrapper = styled.div`
     padding: 20px;
@@ -18,8 +19,8 @@ const ButtonColor = styled.div`
     height: 36px;
     width: 97px;
     border-radius: 18px;
-    /* transform: translateX(${(props)=>(props.slideindex +"px")}); */
-    transform: translateX(${props=>((props.slideindex )+"px")});
+    /* transform: translateX(${(props) => (props.slideindex + "px")}); */
+    transform: translateX(${props => ((props.slideindex) + "px")});
 
 `
 const FollowersButton = styled.button`
@@ -74,115 +75,50 @@ font-weight: 400;
 font-size: 13px;
 `
 
-const ProfileRight = () => {
-    const[slideindex,setSlideindex] = useState(0)
+const ProfileRight = ({ user }) => {
+    const [slideindex, setSlideindex] = useState(0)
     const [followers, setFollowers] = useState(true)
     const [followings, setFollowings] = useState(false)
 
     const handleSwitch = (direction) => {
-        if(direction === "left"){
+        if (direction === "left") {
             setFollowers(true);
             setFollowings(false)
             setSlideindex(0)
-        }else{
+        } else {
             setFollowings(true);
             setFollowers(false)
             setSlideindex(100)
         }
     }
 
-
+    console.log(user)
     return (
         <Fragment>
             <Wrapper>
                 <FollowButtons>
-                    <FollowersButton onClick={()=>handleSwitch("left")}>Followers</FollowersButton>
-                    <FollowingsButton onClick={()=>handleSwitch("right")}>Followings</FollowingsButton>
+                    <FollowersButton onClick={() => handleSwitch("left")}>Followers</FollowersButton>
+                    <FollowingsButton onClick={() => handleSwitch("right")}>Followings</FollowingsButton>
                     <ButtonColor slideindex={slideindex}></ButtonColor>
                 </FollowButtons>
                 <FollowWrapper>
 
                     {followers && <UserFollowers>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Gwen Stacy</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Gwen Stacy</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Gwen Stacy</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Gwen Stacy</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Gwen Stacy</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Gwen Stacy</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Gwen Stacy</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Gwen Stacy</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Gwen Stacy</UserName>
-                        </Users>
+                        {user?.followers?.map((userId)=>
+                        <User userId={userId}/>
+                        )}
+ 
                     </UserFollowers>
                     }
                     {followings && <UserFollowings>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Alice Stone</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Alice Stone</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Alice Stone</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Alice Stone</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Alice Stone</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Alice Stone</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Alice Stone</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Alice Stone</UserName>
-                        </Users>
-                        <Users>
-                            <UserPic src='https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                            <UserName>Alice Stone</UserName>
-                        </Users>
+                        {user?.followings?.map((userId) =>
+                            <User userId={userId}/>
+                        )}
                     </UserFollowings>
                     }
                 </FollowWrapper>
             </Wrapper>
-        </Fragment>
+        </Fragment >
     )
 }
 

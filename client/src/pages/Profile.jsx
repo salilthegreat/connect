@@ -1,11 +1,14 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { styled } from "styled-components";
 import LeftBar from "../components/LeftBar";
 import Middle from "../components/MIddle";
 import Rightbar from "../components/Rightbar";
 import { Add, LocationOn, Message } from "@mui/icons-material";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { userRequest } from "../requestMetohd";
+import { apiCallStart } from "../redux/UserSlice";
 
 const Container = styled.div`
   display: flex;
@@ -88,7 +91,24 @@ const ProfileRightBottom = styled.div`
 `;
 
 const Profile = () => {
+  const params = useParams()
+  const dispatch = useDispatch()
   const {currentUser} = useSelector((state)=>state.user)
+  const [user,setUser] = useState({})
+
+  useEffect(()=>{
+     const GetUser = async() => {
+      dispatch(apiCallStart());
+      try {
+          const res = await userRequest.get(`/users/find/${params.userId}`);
+          console.log(res.data)
+          setUser(res.data)
+      } catch (error) {
+          console.log(error)
+      }
+  }
+  GetUser();
+  },[params])
   return (
     <Fragment>
       <Navbar />
@@ -101,8 +121,8 @@ const Profile = () => {
               <ProfilePic src="https://images.unsplash.com/photo-1485396003708-e7a7ad32484f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2117&q=80" />
             </UserImages>
             <UserDetails>
-              <FullName>{currentUser?.firstName + " " + currentUser?.lastName}</FullName>
-              <UserName>@{currentUser?.userName}</UserName>
+              <FullName>{user?.firstName + " " + user?.lastName}</FullName>
+              <UserName>@{user?.userName}</UserName>
               <UserProfession>Product Designer</UserProfession>
               <UserLocation><LocationOn style={{height:"14px",color:"gray"}}/>Colorado, United States</UserLocation>
               <UserButtons>
@@ -113,7 +133,7 @@ const Profile = () => {
           </ProfileRightTop>
           <ProfileRightBottom>
             <Middle />
-            <Rightbar profile="profile"/>
+            <Rightbar profile="profile" user={user}/>
           </ProfileRightBottom>
         </ProfileRight>
       </Container>
