@@ -5,12 +5,14 @@ const router = require("express").Router();
 
 //CREATE A CONVERSSTION
 router.post("/",verifyToken,async(req,res)=>{
+    const conversationExist = await Conversation.findOne({members:{$all:[req.body.recieverId,req.body.senderId]}})
+    if(conversationExist){ return res.status(200).json(conversationExist)    }
     try {
         const newConversation =  new Conversation(
             { members:[req.body.recieverId,req.body.senderId]}
         );
         await newConversation.save();
-        res.status(200).json(newConversation)
+        res.status(201).json(newConversation)
     } catch (error) {
         res.status(500).json(error.message)
     }

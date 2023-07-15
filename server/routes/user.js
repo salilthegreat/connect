@@ -97,7 +97,7 @@ router.get("/followers/:userId",verifyToken,async(req,res)=>{
 //GET FOLLOWINGS
 router.get("/followings/:userId",verifyToken,async(req,res)=>{
     try {
-        const user = await User.findById(req.params.userId).populate({path:"followings",select:["userName","firstName","lastName","profilePicture"]});
+        const user = await User.findById(req.params.userId).populate({path:"followings",select:["userName","firstName","lastName","profilePicture"]}).exec();
         res.status(200).json(user.followings)
     } catch (error) {
         res.status(500).json(error.message)

@@ -121,6 +121,17 @@ const handleFollow = () => {
   Follow(dispatch,params.userId)
 }
 
+const handleConversation = async()=>{
+  dispatch(apiCallStart());
+  try {
+    const res = await userRequest.post('/conversations',{senderId:currentUser?._id,recieverId:user?._id})
+    console.log(res.data)
+    res && navigate("/message")
+  } catch (error) {
+    console.log(error)
+  }
+}
+
   return (
     <Fragment>
       <Navbar />
@@ -142,7 +153,7 @@ const handleFollow = () => {
                 <UserButton bgcolor="grey" color="white">Update<Message style={{ height: "14px", color: "white" }} /></UserButton>
                 : <>  
                 <UserButton border="true" onClick={handleFollow} >{currentUser?.followings?.includes(params?.userId) ? "Unfollow" : "Follow" } <Add style={{ height: "14px" }} /></UserButton>
-                  <UserButton bgcolor="grey" color="white" onClick={()=>navigate("/message")}>Message<Message style={{ height: "14px", color: "white" }} /></UserButton>
+                  <UserButton bgcolor="grey" color="white" onClick={handleConversation}>Message<Message style={{ height: "14px", color: "white" }} /></UserButton>
                 </> 
                 }
               </UserButtons>

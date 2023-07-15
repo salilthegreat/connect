@@ -17,7 +17,7 @@ router.post("/",verifyToken,async(req,res)=>{
 //GET ALL MESSAGES
 router.get("/:conversationId",verifyToken,async(req,res)=>{
     try {
-        const messages = await Message.find({conversationId:req.params.conversationId});
+        const messages = await Message.find({conversationId:req.params.conversationId}).populate({path:"senderId",select:["firstName","lastName","userName","profilePicture"]}).exec();
         res.status(200).json(messages)
     } catch (error) {
         res.status(500).json(error.message)

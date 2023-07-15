@@ -1,7 +1,12 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import Navbar from "../components/Navbar"
 import styled from "styled-components"
 import { Search } from '@mui/icons-material'
+import { useDispatch, useSelector } from 'react-redux'
+import { apiCallStart } from '../redux/UserSlice'
+import { userRequest } from '../requestMetohd'
+import MessageUsers from '../components/MessageUsers'
+import MessageBubbles from '../components/MessageBubbles'
 
 const Container = styled.div`
 display: flex;
@@ -61,13 +66,7 @@ align-items: center;
 gap: 30px;
 `
 
-const UserImg = styled.img`
-height: 40px;
-width: 40px;
-border-radius: 50%;
-object-fit: cover;
-cursor: pointer;
-`
+
 
 const UserName = styled.span`
 font-size: 15px;
@@ -97,32 +96,7 @@ overflow-y: scroll;
 `
 
 
-const MessageContainer = styled.div`
-margin-bottom: 15px;
-display: flex;
-flex-direction: column;
-gap: 10px;
-align-items: ${props => props.own ? "flex-end" : "flex-start"};
-`
 
-const MessageWrapper = styled.div`
-display: flex;
-gap: 15px;
-`
-
-const UserMessage = styled.div`
-    font-weight: 300;
-    border-radius: 20px;
-    padding: 10px 10px;
-    max-width: 300px;
-    background-color: ${props => props.own ? "white" : "lightgray"};
-    color: ${props => props.own ? "black" : "white"};
-    `
-
-const TimeAgo = styled.span`
-    font-weight: 300;
-    font-size: 11px;
-    `
 const MessageBottom = styled.div`
 display: flex;
 align-items: center;
@@ -206,8 +180,57 @@ const CircleOnline = styled.span`
 `
 
 const Message = () => {
+    
+    const dispatch = useDispatch();
+    const { currentUser } = useSelector((state) => state.user)
+    const [conversation, setConversation] = useState(null)
+    const [chat,setChat] = useState([])
+    const [conversations, setConversations] = useState([])
+    const [newMessage,setNewMessage] = useState({
+        conversationId:"",
+        senderId:currentUser._id,
+        message:""
+    })
 
-    const [conversation,setConversation] = useState(null)
+    useEffect(() => {
+        const UserConversation = async () => {
+            dispatch(apiCallStart());
+            try {
+                const res = await userRequest.get(`/conversations/${currentUser?._id}`);
+                // console.log(res.data)
+                setConversations(res.data.sort((a,b)=> ( new Date(b.createdAt) - new Date(a.createdAt))))
+            } catch (error) {
+                console.log(error)
+            }
+        };
+        UserConversation()
+    }, [])
+
+    
+        const GetMessages = async(chatId) => {
+            setConversation(true)
+            setNewMessage((prev)=>({...prev,["conversationId"]:chatId}))
+            dispatch(apiCallStart());
+        try {
+            const res = await userRequest.get(`/messages/${chatId}`);
+            setChat(res.data)
+        } catch (error) {
+            console.log(error)
+        }
+        }
+
+console.log(newMessage)
+
+        const handleSend = async() => {
+            setNewMessage((prev)=>({...prev,["message"]:""}))
+            dispatch(apiCallStart());
+            try {
+                const res = await userRequest.post('/messages',newMessage);
+                console.log(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
 
     return (
         <Fragment>
@@ -222,16 +245,20 @@ const Message = () => {
                                 <Search style={{ position: "absolute", right: "55px", height: "15px", color: "gray" }} />
                             </SearchWrapper>
                         </LeftTop>
-                        <UserProfiles>
-                            <Users onClick={()=>setConversation(true)}>
+                        <UserProfiles >
+                            {conversations.map((convo) => (
+                                <div onClick={()=>GetMessages(convo._id)}>
+                                <MessageUsers convo={convo} key={convo._id} />
+                                </div>
+                            ))}
+                            {/* {conversations.map((convo)=>{
+                            <Users >
                                 <UserImg src='https://images.pexels.com/photos/1028927/pexels-photo-1028927.jpeg?auto=compress&cs=tinysrgb&w=800' />
                                 <UserName>Lily Leonhart</UserName>
                             </Users>
-                            <Users>
-                                <UserImg src='https://images.pexels.com/photos/1028927/pexels-photo-1028927.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                                <UserName>Lily Leonhart</UserName>
-                            </Users>
-                            
+                            })} */}
+
+
                         </UserProfiles>
                     </LeftWrapper>
                 </Left>
@@ -241,76 +268,72 @@ const Message = () => {
                 <Middle>
                     <MiddleWrapper>
                         {conversation ? <>
-                        <MessageTop>
-                            <MessageContainer>
-                                <MessageWrapper>
-                                    <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                    <UserMessage>Hey, It's been a while,Lorem ipsum dolor sit amet consectetur, adipisicing elit. Facere eius itaque consequatur minus accusantium tenetur omnis, inventore exercitationem at obcaecati, voluptas quasi. Ullam, necessitatibus aliquid sint voluptas velit officia error!</UserMessage>
-                                </MessageWrapper>
-                                <TimeAgo>6 min ago</TimeAgo>
-                            </MessageContainer>
-                            <MessageContainer own={true}>
-                                <MessageWrapper>
-                                    <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                    <UserMessage own={true}>Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
-                                </MessageWrapper>
-                                <TimeAgo>6 min ago</TimeAgo>
-                            </MessageContainer>
-                            <MessageContainer own={true}>
-                                <MessageWrapper>
-                                    <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                    <UserMessage own={true} >Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
-                                </MessageWrapper>
-                                <TimeAgo>6 min ago</TimeAgo>
-                            </MessageContainer>
-                            <MessageContainer >
-                                <MessageWrapper>
-                                    <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                    <UserMessage  >Daijobu kai, mada mada</UserMessage>
-                                </MessageWrapper>
-                                <TimeAgo>6 min ago</TimeAgo>
-                            </MessageContainer>
-                            <MessageContainer >
-                                <MessageWrapper>
-                                    <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                    <UserMessage  >Daijobu kai, mada mada</UserMessage>
-                                </MessageWrapper>
-                                <TimeAgo>6 min ago</TimeAgo>
-                            </MessageContainer>
-                            <MessageContainer own={true}>
-                                <MessageWrapper>
-                                    <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                    <UserMessage own={true} >Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
-                                </MessageWrapper>
-                                <TimeAgo>6 min ago</TimeAgo>
-                            </MessageContainer>
-                            <MessageContainer own={true}>
-                                <MessageWrapper>
-                                    <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                    <UserMessage own={true} >Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
-                                </MessageWrapper>
-                                <TimeAgo>6 min ago</TimeAgo>
-                            </MessageContainer>
-                        </MessageTop>
-                        <MessageBottom>
-                            <MessageArea rows={5}/>
-                            <SendButton>Send</SendButton>
-                        </MessageBottom>
+                            <MessageTop>
+                                {chat?.map((message)=>(   
+                                        <MessageBubbles message={message} />
+                                ))}
+                                {/* <MessageContainer own={true}>
+                                    <MessageWrapper>
+                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
+                                        <UserMessage own={true}>Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
+                                    </MessageWrapper>
+                                    <TimeAgo>6 min ago</TimeAgo>
+                                </MessageContainer>
+                                <MessageContainer own={true}>
+                                    <MessageWrapper>
+                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
+                                        <UserMessage own={true} >Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
+                                    </MessageWrapper>
+                                    <TimeAgo>6 min ago</TimeAgo>
+                                </MessageContainer>
+                                <MessageContainer >
+                                    <MessageWrapper>
+                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
+                                        <UserMessage  >Daijobu kai, mada mada</UserMessage>
+                                    </MessageWrapper>
+                                    <TimeAgo>6 min ago</TimeAgo>
+                                </MessageContainer>
+                                <MessageContainer >
+                                    <MessageWrapper>
+                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
+                                        <UserMessage  >Daijobu kai, mada mada</UserMessage>
+                                    </MessageWrapper>
+                                    <TimeAgo>6 min ago</TimeAgo>
+                                </MessageContainer>
+                                <MessageContainer own={true}>
+                                    <MessageWrapper>
+                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
+                                        <UserMessage own={true} >Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
+                                    </MessageWrapper>
+                                    <TimeAgo>6 min ago</TimeAgo>
+                                </MessageContainer>
+                                <MessageContainer own={true}>
+                                    <MessageWrapper>
+                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
+                                        <UserMessage own={true} >Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
+                                    </MessageWrapper>
+                                    <TimeAgo>6 min ago</TimeAgo>
+                                </MessageContainer> */}
+                            </MessageTop>
+                            <MessageBottom>
+                                <MessageArea rows={5} name='message' value={newMessage?.message} onChange={(e)=>setNewMessage((prev)=> ({...prev,[e.target.name]:e.target.value}))}/>
+                                <SendButton onClick={handleSend}>Send</SendButton>
+                            </MessageBottom>
                         </>
-                        : <NoCoversation>Select a chat ,to start a conversation</NoCoversation>}
+                            : <NoCoversation>Select a chat ,to start a conversation</NoCoversation>}
                     </MiddleWrapper>
                 </Middle>
                 <Right>
                     <RightWrapper>
                         <Header>Online Friends</Header>
                         <OnlineWrapper>
-                        <OnlineProfiles>
-                            <OnlineUsers onClick={()=>setConversation(true)}>
-                                <OnlineUserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1776&q=80' />
-                                <CircleOnline></CircleOnline>
-                                <UserName>Alicia Silverstone</UserName>
-                            </OnlineUsers>
-                        </OnlineProfiles>
+                            <OnlineProfiles>
+                                <OnlineUsers onClick={() => setConversation(true)}>
+                                    <OnlineUserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1776&q=80' />
+                                    <CircleOnline></CircleOnline>
+                                    <UserName>Alicia Silverstone</UserName>
+                                </OnlineUsers>
+                            </OnlineProfiles>
                         </OnlineWrapper>
                     </RightWrapper>
                 </Right>
