@@ -5,10 +5,11 @@ import LeftBar from "../components/LeftBar";
 import Middle from "../components/MIddle";
 import Rightbar from "../components/Rightbar";
 import { Add, LocationOn, Message } from "@mui/icons-material";
-import { useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 import { userRequest } from "../requestMetohd";
 import { apiCallStart } from "../redux/UserSlice";
+import { Follow } from "../redux/apiCalls";
 
 const Container = styled.div`
   display: flex;
@@ -78,9 +79,9 @@ display: flex;
 align-items: center;
 padding: 5px ;
 border-radius: 5px;
-border: ${(props)=>props.border ? "1px solid gray" : "none"};
-background-color: ${props=> props.bgcolor||"none"};
-color: ${props=>props.color || "black"};
+border: ${(props) => props.border ? "1px solid gray" : "none"};
+background-color: ${props => props.bgcolor || "none"};
+color: ${props => props.color || "black"};
 font-size: 13px;
 font-weight: 400;
 cursor: pointer;
@@ -93,21 +94,33 @@ const ProfileRightBottom = styled.div`
 const Profile = () => {
   const params = useParams()
   const dispatch = useDispatch()
-  const [user,setUser] = useState({})
+  const [user, setUser] = useState({})
+  const { currentUser } = useSelector((state) => state.user)
+  const [myProfile,setMyProfile] = useState(false)
+  const navigate = useNavigate()
 
-  useEffect(()=>{
-     const GetUser = async() => {
+  useEffect(() => {
+    const GetUser = async () => {
       dispatch(apiCallStart());
       try {
-          const res = await userRequest.get(`/users/find/${params.userId}`);
-          setUser(res.data)
+        const res = await userRequest.get(`/users/find/${params.userId}`);
+        setUser(res.data)
       } catch (error) {
-          console.log(error)
+        console.log(error)
       }
-  }
-  GetUser();
-  },[params,dispatch])
+    }
+    GetUser();
+  }, [params])
+
+  useEffect(()=>{
+    setMyProfile(currentUser?._id === params?.userId)
+  },[currentUser,params])
+  console.log(currentUser?._id,user?._id)
   // console.log(JSON.parse(JSON.parse(localStorage.getItem("persist:root")).user).currentUser.accessToken)
+const handleFollow = () => {
+  Follow(dispatch,params.userId)
+}
+
   return (
     <Fragment>
       <Navbar />
@@ -123,16 +136,21 @@ const Profile = () => {
               <FullName>{user?.firstName + " " + user?.lastName}</FullName>
               <UserName>@{user?.userName}</UserName>
               <UserProfession>Product Designer</UserProfession>
-              <UserLocation><LocationOn style={{height:"14px",color:"gray"}}/>Colorado, United States</UserLocation>
+              <UserLocation><LocationOn style={{ height: "14px", color: "gray" }} />Colorado, United States</UserLocation>
               <UserButtons>
-                <UserButton border="true" >Connect<Add  style={{height:"14px"}}/></UserButton>
-                <UserButton bgcolor="grey" color="white">Message<Message style={{height:"14px",color:"white"}}/></UserButton>
+                {myProfile ? 
+                <UserButton bgcolor="grey" color="white">Update<Message style={{ height: "14px", color: "white" }} /></UserButton>
+                : <>  
+                <UserButton border="true" onClick={handleFollow} >{currentUser?.followings?.includes(params?.userId) ? "Unfollow" : "Follow" } <Add style={{ height: "14px" }} /></UserButton>
+                  <UserButton bgcolor="grey" color="white" onClick={()=>navigate("/message")}>Message<Message style={{ height: "14px", color: "white" }} /></UserButton>
+                </> 
+                }
               </UserButtons>
             </UserDetails>
           </ProfileRightTop>
           <ProfileRightBottom>
-            <Middle profile= {true}/>
-            <Rightbar profile="profile" user={user}/>
+            <Middle profile={true} />
+            <Rightbar profile="profile" user={user} />
           </ProfileRightBottom>
         </ProfileRight>
       </Container>
