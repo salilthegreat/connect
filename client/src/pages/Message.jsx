@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import Navbar from "../components/Navbar"
 import styled from "styled-components"
 import { Search } from '@mui/icons-material'
@@ -191,6 +191,7 @@ const Message = () => {
         senderId:currentUser._id,
         message:""
     })
+    const scrollRef = useRef()
 
     useEffect(() => {
         const UserConversation = async () => {
@@ -206,10 +207,14 @@ const Message = () => {
         UserConversation()
     }, [])
 
+    useEffect(()=>{
+        scrollRef.current?.scrollIntoView({behavior:"smooth"})
+    },[chat])
+
     
         const GetMessages = async(chatId) => {
             setConversation(true)
-            setNewMessage((prev)=>({...prev,["conversationId"]:chatId}))
+            setNewMessage((prev)=>({...prev,"conversationId":chatId}))
             dispatch(apiCallStart());
         try {
             const res = await userRequest.get(`/messages/${chatId}`);
@@ -227,6 +232,7 @@ console.log(newMessage)
             try {
                 const res = await userRequest.post('/messages',newMessage);
                 console.log(res.data)
+                setChat([...chat,res.data])
             } catch (error) {
                 console.log(error)
             }
@@ -251,14 +257,6 @@ console.log(newMessage)
                                 <MessageUsers convo={convo} key={convo._id} />
                                 </div>
                             ))}
-                            {/* {conversations.map((convo)=>{
-                            <Users >
-                                <UserImg src='https://images.pexels.com/photos/1028927/pexels-photo-1028927.jpeg?auto=compress&cs=tinysrgb&w=800' />
-                                <UserName>Lily Leonhart</UserName>
-                            </Users>
-                            })} */}
-
-
                         </UserProfiles>
                     </LeftWrapper>
                 </Left>
@@ -269,51 +267,11 @@ console.log(newMessage)
                     <MiddleWrapper>
                         {conversation ? <>
                             <MessageTop>
-                                {chat?.map((message)=>(   
+                                {chat?.map((message)=>( 
+                                    <div ref={scrollRef}>
                                         <MessageBubbles message={message} />
+                                        </div>  
                                 ))}
-                                {/* <MessageContainer own={true}>
-                                    <MessageWrapper>
-                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                        <UserMessage own={true}>Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
-                                    </MessageWrapper>
-                                    <TimeAgo>6 min ago</TimeAgo>
-                                </MessageContainer>
-                                <MessageContainer own={true}>
-                                    <MessageWrapper>
-                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                        <UserMessage own={true} >Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
-                                    </MessageWrapper>
-                                    <TimeAgo>6 min ago</TimeAgo>
-                                </MessageContainer>
-                                <MessageContainer >
-                                    <MessageWrapper>
-                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                        <UserMessage  >Daijobu kai, mada mada</UserMessage>
-                                    </MessageWrapper>
-                                    <TimeAgo>6 min ago</TimeAgo>
-                                </MessageContainer>
-                                <MessageContainer >
-                                    <MessageWrapper>
-                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                        <UserMessage  >Daijobu kai, mada mada</UserMessage>
-                                    </MessageWrapper>
-                                    <TimeAgo>6 min ago</TimeAgo>
-                                </MessageContainer>
-                                <MessageContainer own={true}>
-                                    <MessageWrapper>
-                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                        <UserMessage own={true} >Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
-                                    </MessageWrapper>
-                                    <TimeAgo>6 min ago</TimeAgo>
-                                </MessageContainer>
-                                <MessageContainer own={true}>
-                                    <MessageWrapper>
-                                        <UserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2076&q=80' />
-                                        <UserMessage own={true} >Can we talk ? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis, neque eius! Consectetur natus id cupiditate quos quod tempore quasi exercitationem. Eveniet aspernatur ex quibusdam beatae pariatur, exercitationem ipsa aut repellat.</UserMessage>
-                                    </MessageWrapper>
-                                    <TimeAgo>6 min ago</TimeAgo>
-                                </MessageContainer> */}
                             </MessageTop>
                             <MessageBottom>
                                 <MessageArea rows={5} name='message' value={newMessage?.message} onChange={(e)=>setNewMessage((prev)=> ({...prev,[e.target.name]:e.target.value}))}/>

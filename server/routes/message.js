@@ -8,6 +8,7 @@ router.post("/",verifyToken,async(req,res)=>{
     try {
         const newMessage = new Message(req.body);
         await newMessage.save();
+        // const savedMessage = newMessage.populate({path:"senderId",select:["firstName","lastName","userName","profilePicture"]})
         res.status(200).json(newMessage)
     } catch (error) {
         res.status(500).json(error.message)

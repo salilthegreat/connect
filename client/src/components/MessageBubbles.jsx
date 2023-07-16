@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import {styled} from 'styled-components'
+import ReactTimeAgo from 'react-time-ago'
 
 const MessageContainer = styled.div`
 margin-bottom: 15px;
@@ -39,15 +40,15 @@ const TimeAgo = styled.span`
 
 const MessageBubbles = ({message}) => {
     const {currentUser} = useSelector((state)=>state.user)
-    const myMessage = currentUser?._id === message.senderId._id
+    const myMessage = currentUser?._id === message?.senderId?._id || currentUser?._id === message?.senderId
         // console.log(message)
     return (
         <MessageContainer  own={myMessage} >
             <MessageWrapper>
-                <UserImg src={message.senderId.profilePicture ? message.senderId.profilePicture : 'http://localhost:5000/static/profilePic.png'} />
+                <UserImg src={message.senderId?.profilePicture ? message.senderId.profilePicture : 'http://localhost:5000/static/profilePic.png'} />
                 <UserMessage>{message.message}</UserMessage>
             </MessageWrapper>
-            <TimeAgo>6 min ago</TimeAgo>
+            <TimeAgo><ReactTimeAgo date={Date.parse(message.createdAt)} locale="en-US"/></TimeAgo>
         </MessageContainer>
     )
 }
