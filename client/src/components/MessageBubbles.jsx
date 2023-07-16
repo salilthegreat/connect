@@ -45,10 +45,10 @@ const MessageBubbles = ({message}) => {
     return (
         <MessageContainer  own={myMessage} >
             <MessageWrapper>
-                <UserImg src={message.senderId?.profilePicture ? message.senderId.profilePicture : 'http://localhost:5000/static/profilePic.png'} />
-                <UserMessage>{message.message}</UserMessage>
+                <UserImg src={message?.senderId?.profilePicture ? message?.senderId.profilePicture : 'http://localhost:5000/static/profilePic.png'} />
+                <UserMessage>{message?.message}</UserMessage>
             </MessageWrapper>
-            <TimeAgo><ReactTimeAgo date={Date.parse(message.createdAt)} locale="en-US"/></TimeAgo>
+            {/* <TimeAgo><ReactTimeAgo date={Date.parse(message.createdAt) || message.createdAt } locale="en-US"/></TimeAgo> */}
         </MessageContainer>
     )
 }

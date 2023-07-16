@@ -187,6 +187,8 @@ const Message = () => {
     const [conversation, setConversation] = useState(null)
     const [chat,setChat] = useState([])
     const [conversations, setConversations] = useState([])
+    const[socketMessage,setSocketMessage] = useState(null)
+    const [convoid,setConvoid]=useState("")
     const [newMessage,setNewMessage] = useState({
         conversationId:"",
         senderId:currentUser._id,
@@ -197,7 +199,31 @@ const Message = () => {
 
     useEffect(()=>{
         socket.current = io("ws://localhost:8900")
+        socket.current.on("getMessage",(data)=>{
+            setSocketMessage( {
+                conversationId:convoid,
+                senderId:data.senderId,
+                message:data.message,
+                createdAt:Date.now()
+            })
+            
+        })
     },[])
+
+    
+    useEffect(()=>{
+        console.log(socketMessage,"aap")
+        // conversation?.members.includes(socketMessage.senderId) &&
+        setChat([...chat,socketMessage])
+
+    },[socketMessage])
+
+    useEffect(()=>{
+        socket?.current?.emit("addUser",currentUser._id)
+        socket?.current?.on("getUser",user=>{
+            console.log(user,"Online Users")
+        })
+    },[currentUser])
 
     useEffect(() => {
         const UserConversation = async () => {
@@ -218,8 +244,9 @@ const Message = () => {
     },[chat])
 
     
-        const GetMessages = async(chatId) => {
-            setConversation(true)
+        const GetMessages = async(chatId,convo) => {
+            setConversation(convo)
+            setConvoid(chatId)
             setNewMessage((prev)=>({...prev,"conversationId":chatId}))
             dispatch(apiCallStart());
         try {
@@ -230,19 +257,26 @@ const Message = () => {
         }
         }
 
-console.log(newMessage)
+// console.log(newMessage)
 
         const handleSend = async() => {
-            setNewMessage((prev)=>({...prev,["message"]:""}))
+            const recieverId = conversation?.members?.find((m)=>m!==currentUser._id)
+            socket.current.emit("sendMessage",{
+                senderId:currentUser._id,
+                message:newMessage.message,
+                recieverId
+            })
             dispatch(apiCallStart());
+            setNewMessage((prev)=>({...prev,["message"]:""}))
             try {
                 const res = await userRequest.post('/messages',newMessage);
-                console.log(res.data)
                 setChat([...chat,res.data])
+                console.log(res.data)
             } catch (error) {
                 console.log(error)
             }
         }
+        // console.log(conversations,"test")
 
     return (
         <Fragment>
@@ -259,7 +293,7 @@ console.log(newMessage)
                         </LeftTop>
                         <UserProfiles >
                             {conversations.map((convo) => (
-                                <div onClick={()=>GetMessages(convo._id)}>
+                                <div onClick={()=>GetMessages(convo._id,convo)}>
                                 <MessageUsers convo={convo} key={convo._id} />
                                 </div>
                             ))}
