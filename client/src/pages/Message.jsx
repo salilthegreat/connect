@@ -7,6 +7,7 @@ import { apiCallStart } from '../redux/UserSlice'
 import { userRequest } from '../requestMetohd'
 import MessageUsers from '../components/MessageUsers'
 import MessageBubbles from '../components/MessageBubbles'
+import {io} from "socket.io-client"
 
 const Container = styled.div`
 display: flex;
@@ -192,6 +193,11 @@ const Message = () => {
         message:""
     })
     const scrollRef = useRef()
+   const socket = useRef(null)
+
+    useEffect(()=>{
+        socket.current = io("ws://localhost:8900")
+    },[])
 
     useEffect(() => {
         const UserConversation = async () => {
