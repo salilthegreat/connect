@@ -8,6 +8,7 @@ import { userRequest } from '../requestMetohd'
 import MessageUsers from '../components/MessageUsers'
 import MessageBubbles from '../components/MessageBubbles'
 import {io} from "socket.io-client"
+import OnlineUsers from '../components/OnlineUsers'
 
 const Container = styled.div`
 display: flex;
@@ -61,19 +62,6 @@ height: 85%;
 overflow-y: scroll;
 `
 
-const Users = styled.div`
-display: flex;
-align-items: center;
-gap: 30px;
-`
-
-
-
-const UserName = styled.span`
-font-size: 15px;
-font-weight: 400;
-cursor: pointer;
-`
 
 
 
@@ -155,30 +143,6 @@ gap: 20px;
 overflow-y: scroll;
 `
 
-const OnlineUsers = styled.div`
-display: flex;
-align-items: center;
-gap: 30px;
-position: relative;
-`
-
-const OnlineUserImg = styled.img`
-height: 40px;
-width: 40px;
-border-radius: 50%;
-border: 1px solid green;
-object-fit: cover;
-cursor: pointer;
-`
-const CircleOnline = styled.span`
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: green;
-    top: 0;
-    left: 28px;
-`
 
 const Message = () => {
     
@@ -188,7 +152,7 @@ const Message = () => {
     const [chat,setChat] = useState([])
     const [conversations, setConversations] = useState([])
     const[socketMessage,setSocketMessage] = useState(null)
-    const [convoid,setConvoid]=useState("")
+    const[onlineUser,setOnlineUser] = useState([])
     const [newMessage,setNewMessage] = useState({
         conversationId:"",
         senderId:currentUser._id,
@@ -201,7 +165,7 @@ const Message = () => {
         socket.current = io("ws://localhost:8900")
         socket.current.on("getMessage",(data)=>{
             setSocketMessage( {
-                conversationId:convoid,
+                conversationId:setNewMessage.conversationId,
                 senderId:data.senderId,
                 message:data.message,
                 createdAt:Date.now()
@@ -212,19 +176,22 @@ const Message = () => {
 
     
     useEffect(()=>{
-        console.log(socketMessage,"aap")
-        // conversation?.members.includes(socketMessage.senderId) &&
-        setChat([...chat,socketMessage])
+        // console.log(socketMessage,"aap")
+        // console.log(conversation,"app2")
+        conversation?.members.includes(socketMessage?.senderId) &&
+        setChat(prev=>[...prev,socketMessage])
 
-    },[socketMessage])
+    },[socketMessage,conversation])
 
     useEffect(()=>{
-        socket?.current?.emit("addUser",currentUser._id)
-        socket?.current?.on("getUser",user=>{
-            console.log(user,"Online Users")
+        socket?.current?.emit("addUser",currentUser?._id)
+        socket?.current?.on("getUser",users=>{
+            setOnlineUser(()=> {return users.filter((u)=>u.userId !== currentUser?._id)})
         })
     },[currentUser])
 
+
+    //to set the user list at left bar for all the users that the current user has communicated with
     useEffect(() => {
         const UserConversation = async () => {
             dispatch(apiCallStart());
@@ -237,20 +204,23 @@ const Message = () => {
             }
         };
         UserConversation()
-    }, [])
+    }, [currentUser,dispatch])
+
+    //for scrolling of the screen to the current message
 
     useEffect(()=>{
         scrollRef.current?.scrollIntoView({behavior:"smooth"})
     },[chat])
 
-    
-        const GetMessages = async(chatId,convo) => {
-            setConversation(convo)
-            setConvoid(chatId)
-            setNewMessage((prev)=>({...prev,"conversationId":chatId}))
+    //to fetch the messages after the current user clicks on any of the listed user
+
+        const GetMessages = async(convo) => {
+            setConversation(convo) //to find the reciever id in the conversation before sending message
+        
+            setNewMessage((prev)=>({...prev,"conversationId":convo._id}))  //it is set so that we can set up the conversatinid while recieving the message from socket
             dispatch(apiCallStart());
         try {
-            const res = await userRequest.get(`/messages/${chatId}`);
+            const res = await userRequest.get(`/messages/${convo._id}`);
             setChat(res.data)
         } catch (error) {
             console.log(error)
@@ -259,15 +229,19 @@ const Message = () => {
 
 // console.log(newMessage)
 
+//sending message when clicked on the send
+
         const handleSend = async() => {
-            const recieverId = conversation?.members?.find((m)=>m!==currentUser._id)
-            socket.current.emit("sendMessage",{
-                senderId:currentUser._id,
-                message:newMessage.message,
-                recieverId
-            })
+            const recieverId = conversation?.members?.find((m)=>m!==currentUser?._id) //this will be sent to socket server for instant messaging
+            onlineUser.some((user)=>user.userId === recieverId) &&(
+                socket.current.emit("sendMessage",{
+                    senderId:currentUser._id,
+                    message:newMessage.message,
+                    recieverId
+                })
+            )
             dispatch(apiCallStart());
-            setNewMessage((prev)=>({...prev,["message"]:""}))
+            setNewMessage((prev)=>({...prev,"message":""}))
             try {
                 const res = await userRequest.post('/messages',newMessage);
                 setChat([...chat,res.data])
@@ -276,7 +250,18 @@ const Message = () => {
                 console.log(error)
             }
         }
-        // console.log(conversations,"test")
+        // console.log(onlineUser,"gote")
+
+        const handleOnlineConversation = async(recieverId) => {
+            
+            try {
+                const res = await userRequest.get(`/conversations/${currentUser?._id}/${recieverId}`);
+                GetMessages(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+            
+        }
 
     return (
         <Fragment>
@@ -293,7 +278,7 @@ const Message = () => {
                         </LeftTop>
                         <UserProfiles >
                             {conversations.map((convo) => (
-                                <div onClick={()=>GetMessages(convo._id,convo)}>
+                                <div onClick={()=>GetMessages(convo)}>
                                 <MessageUsers convo={convo} key={convo._id} />
                                 </div>
                             ))}
@@ -309,7 +294,7 @@ const Message = () => {
                             <MessageTop>
                                 {chat?.map((message)=>( 
                                     <div ref={scrollRef}>
-                                        <MessageBubbles message={message} />
+                                        <MessageBubbles message={message} key={message?._id} />
                                         </div>  
                                 ))}
                             </MessageTop>
@@ -326,11 +311,17 @@ const Message = () => {
                         <Header>Online Friends</Header>
                         <OnlineWrapper>
                             <OnlineProfiles>
-                                <OnlineUsers onClick={() => setConversation(true)}>
-                                    <OnlineUserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1776&q=80' />
-                                    <CircleOnline></CircleOnline>
-                                    <UserName>Alicia Silverstone</UserName>
-                                </OnlineUsers>
+                                {onlineUser?.map((user)=>(
+                                    <div onClick={() => handleOnlineConversation(user.userId)}>
+
+                                        <OnlineUsers userId={user.userId}/>
+                                    </div>
+                                // <OnlineUser onClick={() => handleOnlineConversation(user.userId)}>
+                                //     <OnlineUserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1776&q=80' />
+                                //     <CircleOnline></CircleOnline>
+                                //     <UserName>Alicia Silverstone</UserName>
+                                // </OnlineUser>
+                                ))}
                             </OnlineProfiles>
                         </OnlineWrapper>
                     </RightWrapper>
