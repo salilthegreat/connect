@@ -19,7 +19,6 @@ export const SignUp = async(dispatch,userCredentials)=>{
     try {
         const res = await publicRequest.post("/auths/register",userCredentials);
         dispatch(signUpSuccess(res.data))
-        console.log(res.data)
     } catch (error) {
         dispatch(apiCallError(error.response.status))     
     }

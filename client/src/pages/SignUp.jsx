@@ -3,6 +3,9 @@ import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { SignUp } from "../redux/apiCalls"
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { refreshState } from "../redux/UserSlice"
 
 
 const Navbar = styled.nav`
@@ -143,15 +146,24 @@ const Signup = () => {
   const handleChange = (e) => {
     setUserCredentials((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
-  // console.log(userCredentials)
+
 
   const handleSignUp = (e) => {
     e.preventDefault();
     SignUp(dispatch, userCredentials)
   }
 
+  useEffect(()=>{
+    dispatch(refreshState())
+    // eslint-disable-next-line
+  },[])
+
   useEffect(() => {
-    signUpRes && navigate("/") 
+    signUpRes && toast("Sign Up Successful")
+    signUpRes && setTimeout(()=>{
+      navigate("/")
+    },1500)
+    // eslint-disable-next-line
   },[signUpRes])
 
   return (
@@ -209,6 +221,7 @@ const Signup = () => {
             </Form>
             <SignUpMsg>Already have an account? <Span><Link to={"/"}>Login</Link></Span> </SignUpMsg>
           </Rightdiv>
+          <ToastContainer />
         </ContainerDiv>
       </Maindiv>
     </Fragment>

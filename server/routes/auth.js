@@ -34,9 +34,9 @@ const createRefreshToken = ({ userId, isAdmin }) => {
 //LOGIN
 router.post("/login", async (req, res) => {
     try {
-        const { userName, password } = req.body;
-        const user = await User.findOne({ userName });
-        if (!user) return res.status(401).json("Username dosen't exist");
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) return res.status(401).json("Email dosen't exist");
         let isValid = await bcrypt.compare(password, user.password);
         if (!isValid) return res.status(401).json("Password invalid")
         const accessToken =  createAccessToken({ userId:user._id, isAdmin: user.isAdmin })

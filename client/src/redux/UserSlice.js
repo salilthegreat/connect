@@ -28,9 +28,12 @@ export const UserSlice = createSlice({
         },
         logOut: (state) => {
             state.currentUser = null;
+            state.loading = false;
+            state.error = null;
         },
-        refreshLogin: (state) => {
+        refreshState: (state) => {
             state.signUpRes = null;
+            state.error = null;
         },
         updateUserSuccess:(state,action)=>{
             state.currentUser= action.payload;
@@ -50,5 +53,5 @@ export const UserSlice = createSlice({
     }
 });
 
-export const { apiCallStart, loginSuccess, apiCallError, signUpSuccess, logOut, refreshLogin,updateUserSuccess,followedUser,unfollowedUser } = UserSlice.actions;
+export const { apiCallStart, loginSuccess, apiCallError, signUpSuccess, logOut, refreshState,updateUserSuccess,followedUser,unfollowedUser } = UserSlice.actions;
 export default UserSlice.reducer

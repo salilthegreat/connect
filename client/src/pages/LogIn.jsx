@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { Login } from "../redux/apiCalls"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {  refreshLogin } from "../redux/UserSlice"
+import {  refreshState } from "../redux/UserSlice"
 
 
 const Navbar = styled.nav`
@@ -148,21 +148,21 @@ const LogIn = () => {
     setUserCredentials(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
   useEffect(()=>{
-    dispatch(refreshLogin())
-  })
+    dispatch(refreshState())
+    // eslint-disable-next-line
+  },[])
 
   useEffect(()=>{
     currentUser && toast("Login Successful")
     currentUser && setTimeout(()=>{
       window.location.reload()
-    })
+    },1000)
   },[currentUser])
 
   const handleLogin =  (e) => {
     e.preventDefault()
     Login(dispatch,userCredentials);
   }
-  console.log(currentUser)
 
   return (
     <Fragment>
@@ -179,23 +179,23 @@ const LogIn = () => {
           <Rightdiv>
             <Heading>Hello again!</Heading>
             <Subtitle>Welcome back you've been missed!🙂 </Subtitle>
-            <Form>
+            <Form onSubmit={handleLogin}>
             {error && <ErrorMsg>{(error===401) && "Invalid username or password"}</ErrorMsg>}
              {error && <ErrorMsg>{(error===500) && "Something went wrong"}</ErrorMsg>}
               <InputWrapperFlex>
                 <InputWrapper>
                   <Label>Email</Label>
-                  <Input type="email" name="userName" placeholder="johndoe@gmail.com" onChange={handleChange}></Input>
+                  <Input type="email" name="email" placeholder="johndoe@gmail.com" minLength={5} onChange={handleChange} required/>
                 </InputWrapper>
               </InputWrapperFlex>
               <InputWrapperFlex>
                 <InputWrapper>
                   <Label>Password</Label>
-                  <Input type="password" name="password" placeholder="password" onChange={handleChange}></Input>
+                  <Input type="password" name="password" placeholder="password" minLength={5} onChange={handleChange} required/>
                 </InputWrapper>
               </InputWrapperFlex>
               <ButtonWrapper>
-                <Button onClick={handleLogin}> {loading ? "Loading" : "Log In" }</Button>
+                <Button type="submit" > {loading ? "Loading" : "Log In" }</Button>
               </ButtonWrapper>
             </Form>
             <SignUpMsg>Don't have an account? <Span><Link to={"/signup"}>SignUp</Link></Span></SignUpMsg>
