@@ -30,7 +30,6 @@ export const UpdateUser = async(dispatch,userId,updateData) =>{
     dispatch(apiCallStart());
     try {
         const res = await userRequest.put(`/users/update/${userId}`,updateData);
-        console.log(res.data)
         dispatch(updateUserSuccess(res.data));
     } catch (error) {
         console.log(error)

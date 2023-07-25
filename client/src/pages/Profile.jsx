@@ -4,15 +4,17 @@ import { styled } from "styled-components";
 import LeftBar from "../components/LeftBar";
 import Middle from "../components/MIddle";
 import Rightbar from "../components/Rightbar";
-import { Add, LocationOn, Message } from "@mui/icons-material";
+import { Add, AddAPhoto, LocationOn, Message } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { userRequest } from "../requestMetohd";
 import { apiCallStart } from "../redux/UserSlice";
-import { Follow } from "../redux/apiCalls";
+import { Follow, UpdateUser } from "../redux/apiCalls";
+import Edit from "../components/Edit";
 
 const Container = styled.div`
   display: flex;
+  position: relative;
 `;
 const ProfileRight = styled.div`
   display: flex;
@@ -20,6 +22,7 @@ const ProfileRight = styled.div`
   flex-direction: column;
 `;
 const ProfileRightTop = styled.div``;
+
 const UserImages = styled.div`
   position: relative;
   margin-bottom: 30px;
@@ -29,6 +32,30 @@ const CoverPic = styled.img`
   height: 30vh;
   object-fit: cover;
 `;
+
+const UpdatePicInput = styled.input`
+  display: none;
+`
+
+const UploadLabel = styled.label`
+  
+`
+const ButtonWrapper = styled.div`
+  position: absolute;
+  right: 0;
+  bottom: 20px;
+  right: 45px;
+
+`
+
+const UploadButtons = styled.button`
+  padding: 5px 5px;
+  background-color:gray;
+  border-radius: 5px;
+  border: 1px solid black;
+  margin-right: 5px;
+`
+
 const ProfilePic = styled.img`
   height: 150px;
   width: 150px;
@@ -96,9 +123,11 @@ const Profile = () => {
   const dispatch = useDispatch()
   const [user, setUser] = useState({})
   const { currentUser } = useSelector((state) => state.user)
-  const [myProfile,setMyProfile] = useState(false)
-  const navigate = useNavigate()
-
+  const [myProfile, setMyProfile] = useState(false)
+  const navigate = useNavigate();
+  const [coverPicture, setCoverPicture] = useState(null)
+  const [profilePicture, setProfilePicture] = useState(null)
+  const [uploading, setUploading] = useState(false)
   useEffect(() => {
     const GetUser = async () => {
       dispatch(apiCallStart());
@@ -112,25 +141,58 @@ const Profile = () => {
     GetUser();
   }, [params])
 
-  useEffect(()=>{
+  useEffect(() => {
     setMyProfile(currentUser?._id === params?.userId)
-  },[currentUser,params])
-  console.log(currentUser?._id,user?._id)
+  }, [currentUser, params])
   // console.log(JSON.parse(JSON.parse(localStorage.getItem("persist:root")).user).currentUser.accessToken)
-const handleFollow = () => {
-  Follow(dispatch,params.userId)
-}
-
-const handleConversation = async()=>{
-  dispatch(apiCallStart());
-  try {
-    const res = await userRequest.post('/conversations',{senderId:currentUser?._id,recieverId:user?._id})
-    console.log(res.data)
-    res && navigate("/message")
-  } catch (error) {
-    console.log(error)
+  const handleFollow = () => {
+    Follow(dispatch, params.userId)
   }
-}
+
+  const handleConversation = async () => {
+    dispatch(apiCallStart());
+    try {
+      const res = await userRequest.post('/conversations', { senderId: currentUser?._id, recieverId: user?._id })
+      console.log(res.data)
+      res && navigate("/message")
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    setUploading(true)
+    if(profilePicture){
+      const data = new FormData();
+      const fileName = new Date().getTime() + profilePicture.name;
+      data.append("name",fileName);
+      data.append("file",profilePicture)
+      try {
+        const res = await userRequest.post('/upload', data);
+         UpdateUser(dispatch, currentUser._id, { profilePicture: res.data.file })
+        setUploading(false)
+      } catch (error) {
+        console.log(error)
+        setUploading(false)
+      }
+    }
+    if(coverPicture){
+      const data = new FormData();
+      const fileName = new Date().getTime() + coverPicture.name;
+      data.append("name",fileName);
+      data.append("file",coverPicture)
+      try {
+        const res = await userRequest.post('/upload', data);
+         UpdateUser(dispatch, currentUser._id, { coverPicture: res.data.file })
+        setUploading(false)
+      } catch (error) {
+        console.log(error)
+        setUploading(false)
+      }
+    }
+
+  }
 
   return (
     <Fragment>
@@ -140,21 +202,41 @@ const handleConversation = async()=>{
         <ProfileRight>
           <ProfileRightTop>
             <UserImages>
-              <CoverPic src="https://images.unsplash.com/photo-1483884105135-c06ea81a7a80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" />
-              <ProfilePic src="https://images.unsplash.com/photo-1485396003708-e7a7ad32484f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2117&q=80" />
+              <form action="">
+                {coverPicture ? <CoverPic src={URL.createObjectURL(coverPicture)} /> : <CoverPic src={user?.coverPicture ? user.coverPicture : "https://www.solidbackgrounds.com/images/2560x1440/2560x1440-davys-grey-solid-color-background.jpg"} />}
+                <UpdatePicInput id="coverPicInput" type="file" accept=".png,.jpg,.jpeg" onChange={(e) => setCoverPicture(e.target.files[0])} key={Date.now()} />
+                <UploadLabel htmlFor="coverPicInput">
+                  <AddAPhoto style={{ position: "absolute", right: '10px', bottom: '30px', color: 'white' }} />
+                  {coverPicture && <ButtonWrapper>
+                    <UploadButtons onClick={(e) => handleUpload(e)}>{uploading ? "Uploading" : "Upload"}</UploadButtons>
+                    <UploadButtons>Cancel</UploadButtons>
+                  </ButtonWrapper>}
+                </UploadLabel>
+                {profilePicture ? <ProfilePic src={URL.createObjectURL(profilePicture)} /> : <ProfilePic src={user?.profilePicture ? user.profilePicture : 'http://localhost:5000/static/profilePic.png'} />}
+                <UploadLabel htmlFor="profilePicInput">
+                  <AddAPhoto style={{ position: "absolute", right: '10px', bottom: '0px', color: 'red' }} />
+                </UploadLabel>
+                <UpdatePicInput id="profilePicInput" type="file" accept="image/*" onChange={(e) => setProfilePicture(e.target.files[0])} />
+                {profilePicture && <ButtonWrapper>
+                  <UploadButtons onClick={(e) => handleUpload(e)}>{uploading ? "Uploading" : "Upload"} </UploadButtons>
+                  <UploadButtons onClick={() => setProfilePicture("")}>Cancel</UploadButtons>
+                </ButtonWrapper>}
+              </form>
             </UserImages>
             <UserDetails>
               <FullName>{user?.firstName + " " + user?.lastName}</FullName>
               <UserName>@{user?.userName}</UserName>
-              <UserProfession>Product Designer</UserProfession>
-              <UserLocation><LocationOn style={{ height: "14px", color: "gray" }} />Colorado, United States</UserLocation>
+              <UserProfession>{user?.profession}</UserProfession>
+              <UserLocation><LocationOn style={{ height: "14px", color: "gray" }} />{user?.currentCity}, {user?.country}</UserLocation>
               <UserButtons>
-                {myProfile ? 
-                <UserButton bgcolor="grey" color="white">Update<Message style={{ height: "14px", color: "white" }} /></UserButton>
-                : <>  
-                <UserButton border="true" onClick={handleFollow} >{currentUser?.followings?.includes(params?.userId) ? "Unfollow" : "Follow" } <Add style={{ height: "14px" }} /></UserButton>
-                  <UserButton bgcolor="grey" color="white" onClick={handleConversation}>Message<Message style={{ height: "14px", color: "white" }} /></UserButton>
-                </> 
+                {myProfile ? <>
+                  <UserButton bgcolor="grey" color="white">Update<Message style={{ height: "14px", color: "white" }} /></UserButton>
+                  <Edit />
+                </>
+                  : <>
+                    <UserButton border="true" onClick={handleFollow} >{currentUser?.followings?.includes(params?.userId) ? "Unfollow" : "Follow"} <Add style={{ height: "14px" }} /></UserButton>
+                    <UserButton bgcolor="grey" color="white" onClick={handleConversation}>Message<Message style={{ height: "14px", color: "white" }} /></UserButton>
+                  </>
                 }
               </UserButtons>
             </UserDetails>

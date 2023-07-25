@@ -280,7 +280,7 @@ const Post = ({ item }) => {
         </DelteModal>}
         <UserSection>
           <UserSectionLeft>
-            <ProfilePic src={currentUser?.profilePicture ? currentUser?.profilePicture : "http://localhost:5000/static/profilePic.png"} onClick={()=>navigate(`/profile/${user._id}`)} />
+            <ProfilePic src={user?.profilePicture ? user?.profilePicture : "http://localhost:5000/static/profilePic.png"} onClick={()=>navigate(`/profile/${user._id}`)} />
             <UserDetails>
               <Name onClick={()=>navigate(`/profile/${user._id}`)}>{user?.userName}</Name>
               <Time><ReactTimeAgo date={Date.parse(item?.createdAt) || item?.createdAt} locale="en-US" /></Time>

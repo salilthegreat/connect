@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt")
 const { verifyToken, verifyTokenAndAdmin, verifyTokenAndAuthorization } = require("./verifyToken");
+const jwt = require("jsonwebtoken")
 
 const router = require("express").Router();
 
@@ -47,7 +48,8 @@ router.put("/update/:userId", verifyTokenAndAuthorization, async (req, res) => {
             req.body.password = await bcrypt.hash(req.body.password, 10);
         }
         const updatedUser = await User.findByIdAndUpdate(req.params.userId, { $set: req.body }, { new: true })
-        res.status(200).json(updatedUser)
+        const accessToken =  jwt.sign({userId:updatedUser._id,isAdmin:updatedUser.isAdmin},process.env.JWT_SECRET)
+        res.status(200).json({...updatedUser._doc,accessToken})
     } catch (error) {
         res.status(500).json(error)
     }
