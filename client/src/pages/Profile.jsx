@@ -4,13 +4,14 @@ import { styled } from "styled-components";
 import LeftBar from "../components/LeftBar";
 import Middle from "../components/MIddle";
 import Rightbar from "../components/Rightbar";
-import { Add, AddAPhoto, LocationOn, Message } from "@mui/icons-material";
+import { Add, AddAPhoto, Facebook, Instagram, LinkedIn, LocationOn, Message } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { userRequest } from "../requestMetohd";
 import { apiCallStart } from "../redux/UserSlice";
 import { Follow, UpdateUser } from "../redux/apiCalls";
 import Edit from "../components/Edit";
+
 
 const Container = styled.div`
   display: flex;
@@ -95,6 +96,14 @@ const UserLocation = styled.div`
   display: flex;
   align-items: center;
 `
+const UserLinks = styled.div`
+  display: flex;
+  align-items: center;
+`
+const UserLink = styled.a`
+color: darkblue;
+`
+
 const UserButtons = styled.div`
 margin: 10px;
 display: flex;
@@ -122,10 +131,10 @@ const Profile = () => {
   const params = useParams()
   const dispatch = useDispatch()
   const [user, setUser] = useState({})
-  const { currentUser } = useSelector((state) => state.user)
   const [myProfile, setMyProfile] = useState(false)
   const navigate = useNavigate();
   const [coverPicture, setCoverPicture] = useState(null)
+  const { currentUser } = useSelector((state) => state.user)
   const [profilePicture, setProfilePicture] = useState(null)
   const [uploading, setUploading] = useState(false)
   useEffect(() => {
@@ -139,6 +148,7 @@ const Profile = () => {
       }
     }
     GetUser();
+    // eslint-disable-next-line
   }, [params])
 
   useEffect(() => {
@@ -153,7 +163,6 @@ const Profile = () => {
     dispatch(apiCallStart());
     try {
       const res = await userRequest.post('/conversations', { senderId: currentUser?._id, recieverId: user?._id })
-      console.log(res.data)
       res && navigate("/message")
     } catch (error) {
       console.log(error)
@@ -163,28 +172,28 @@ const Profile = () => {
   const handleUpload = async (e) => {
     e.preventDefault();
     setUploading(true)
-    if(profilePicture){
+    if (profilePicture) {
       const data = new FormData();
       const fileName = new Date().getTime() + profilePicture.name;
-      data.append("name",fileName);
-      data.append("file",profilePicture)
+      data.append("name", fileName);
+      data.append("file", profilePicture)
       try {
         const res = await userRequest.post('/upload', data);
-         UpdateUser(dispatch, currentUser._id, { profilePicture: res.data.file })
+        UpdateUser(dispatch, currentUser?._id, { profilePicture: res.data.file })
         setUploading(false)
       } catch (error) {
         console.log(error)
         setUploading(false)
       }
     }
-    if(coverPicture){
+    if (coverPicture) {
       const data = new FormData();
       const fileName = new Date().getTime() + coverPicture.name;
-      data.append("name",fileName);
-      data.append("file",coverPicture)
+      data.append("name", fileName);
+      data.append("file", coverPicture)
       try {
         const res = await userRequest.post('/upload', data);
-         UpdateUser(dispatch, currentUser._id, { coverPicture: res.data.file })
+        UpdateUser(dispatch, currentUser?._id, { coverPicture: res.data.file })
         setUploading(false)
       } catch (error) {
         console.log(error)
@@ -224,10 +233,15 @@ const Profile = () => {
               </form>
             </UserImages>
             <UserDetails>
-              <FullName>{user?.firstName + " " + user?.lastName}</FullName>
-              <UserName>@{user?.userName}</UserName>
+              {(user?.firstName || user?.lastName) &&<FullName>{user.firstName + " " + user.lastName}</FullName>}
+              <UserName>{user?.userName && <span>@</span>}{user?.userName}</UserName>
               <UserProfession>{user?.profession}</UserProfession>
-              <UserLocation><LocationOn style={{ height: "14px", color: "gray" }} />{user?.currentCity}, {user?.country}</UserLocation>
+              <UserLocation>{(user?.currentCity || user?.country) && <LocationOn style={{ height: "14px", color: "gray" }} />}<span>{user?.currentCity}</span> {(user?.currentCity && user?.country) && <span>,</span>} <span>{user?.country}</span></UserLocation>
+              <UserLinks>
+               {user?.instagram && <UserLink href={user.instagram} target="_blank"><Instagram style={{height:"18px"}}/></UserLink> } 
+               {user?.facebook && <UserLink href={user.facebook} target="_blank"><Facebook style={{height:"18px"}}/></UserLink> } 
+               {user?.linkedIn && <UserLink href={user.linkedIn} target="_blank"><LinkedIn style={{height:"18px"}}/></UserLink> } 
+              </UserLinks>
               <UserButtons>
                 {myProfile ? <>
                   <UserButton bgcolor="grey" color="white">Update<Message style={{ height: "14px", color: "white" }} /></UserButton>

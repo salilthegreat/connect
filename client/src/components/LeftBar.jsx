@@ -42,12 +42,13 @@ const UserDetails = styled.div`
 display: flex;
 flex-direction: column;
 cursor: pointer;
+align-items: center;
 `
-const Username = styled.span`
+const Username = styled.div`
 font-weight: 500;
 font-size: 14px;
 `
-const Location = styled.span`
+const Location = styled.div`
 font-weight: 300;
 font-size: 10px;
 `
@@ -124,10 +125,10 @@ const LeftBar = () => {
     if(check==="insta"){
       setShowInputInsta(!showInputInsta)
     } else if(check === "fb"){
-    setShowInputFb(!showInputFb)
-  }else if(check === "lIn"){
-    setShowInputLin(!showInputLin)
-  }
+      setShowInputFb(!showInputFb)
+    }else if(check === "lIn"){
+      setShowInputLin(!showInputLin)
+    }
 }
 
 
@@ -136,10 +137,10 @@ const LeftBar = () => {
       <Container>
         <Wrapper>
           <TopDiv>
-            <UserImg src='https://images.unsplash.com/photo-1602442787305-decbd65be507?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80' />
+            <UserImg src={currentUser?.profilePicture ? currentUser.profilePicture : "http://localhost:5000/static/profilePic.png"} />
             <UserDetails>
               <Username>{currentUser?.firstName + " " + currentUser?.lastName}</Username>
-              <Location>{(currentUser?.currentCity) && currentUser?.currentCity},{(currentUser?.currentCity) && currentUser?.country}</Location>
+              <Location><span>{ currentUser?.currentCity}</span> {(currentUser?.currentCity && currentUser?.country) && <span>,</span> }<span>{ currentUser?.country}</span></Location>
             </UserDetails>
             <UpdateProfile>
               <Settings style={{ color: "gray", fontSize: "18px" }} />
@@ -156,17 +157,17 @@ const LeftBar = () => {
           <BottomDiv>
             <Heading>SOCIALS</Heading>
             <SocialHolder>
-              <ImageLink href={currentUser?.instagram}><Instagram /></ImageLink>
+              <ImageLink href={currentUser?.instagram} target='_blank'><Instagram /></ImageLink>
               {showInputInsta && <><input name='instagram' type="text" defaultValue={currentUser?.instagram} onChange={handleChange} /><Send style={{ height: "16px", color: "gray" }} onClick={()=>handleUpdate("insta")} /></>}
               <Edit onClick={(e) => setShowInputInsta(!showInputInsta)} style={{ height: "16px", color: "gray" }} />
             </SocialHolder>
             <SocialHolder>
-              <ImageLink href={currentUser?.facebook}><Facebook /></ImageLink>
+              <ImageLink href={currentUser?.facebook } target='_blank'><Facebook /></ImageLink>
               {showInputFb && <><input name='facebook' type="text" defaultValue={currentUser?.facebook} onChange={handleChange} /><Send style={{ height: "16px", color: "gray" }} onClick={()=>handleUpdate("fb")} /></>}
               <Edit onClick={(e) => setShowInputFb(!showInputFb)} style={{ height: "16px", color: "gray" }} />
             </SocialHolder>
             <SocialHolder>
-              <ImageLink href={currentUser?.linkedIn}><LinkedIn /></ImageLink>
+              <ImageLink href={currentUser?.linkedIn} target='_blank'><LinkedIn /></ImageLink>
               {showInputLin && <><input name='linkedIn' type="text" defaultValue={currentUser?.linkedIn} onChange={handleChange} /><Send style={{ height: "16px", color: "gray" }} onClick={()=>handleUpdate("lIn")} /></>}
               <Edit onClick={(e) => setShowInputLin(!showInputLin)} style={{ height: "16px", color: "gray" }} />
             </SocialHolder>

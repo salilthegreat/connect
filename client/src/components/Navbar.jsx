@@ -136,7 +136,7 @@ const Navbar = () => {
             </MiddleNav>
             <RightNav>
                 <Profile>
-                    <ProfilePic src='https://images.unsplash.com/photo-1602442787305-decbd65be507?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80'></ProfilePic>
+                    <ProfilePic src={currentUser?.profilePicture ? currentUser.profilePicture : "http://localhost:5000/static/profilePic.png"}></ProfilePic>
                     <Name>{currentUser?.firstName + " " + currentUser?.lastName}</Name>
                 </Profile>
                 <LogOutButton onClick={handleLogout}>

@@ -10,19 +10,44 @@ position: relative;
 margin-bottom: 20px;
 `
 
+// const ButtonColor = styled.div`
+//     position: absolute;
+//     background-color: gray;
+//     opacity: 0.3;
+//     top: 0;
+//     left: 0px;
+//     height: 38px;
+//     width: 100px;
+//     border-radius: 18px;
+//     /* transform: translateX(${(props) => (props.slideindex + "px")}); */
+//     transform: translateX(${props => ((props.slideindex) + "px")});
+// `
+
 const ButtonColor = styled.div`
+&.left{
     position: absolute;
     background-color: gray;
     opacity: 0.3;
     top: 0;
     left: 0px;
-    height: 36px;
-    width: 97px;
+    height: 38px;
+    width: 100px;
     border-radius: 18px;
-    /* transform: translateX(${(props) => (props.slideindex + "px")}); */
-    transform: translateX(${props => ((props.slideindex) + "px")});
+}
 
+&.right{
+    position: absolute;
+    background-color: gray;
+    opacity: 0.3;
+    top: 0;
+    left: 0px;
+    height: 38px;
+    width: 108px;
+    border-radius: 18px; 
+    transform: translateX(100px);
+}
 `
+
 const FollowersButton = styled.button`
 border: none;
 padding: 10px 20px;
@@ -58,37 +83,20 @@ width: 100%;
 gap: 20px;
 `
 
-const Users = styled.div`
-display: flex;
-flex-direction: column;
-align-items: center;
-cursor: pointer;
-`
-const UserPic = styled.img`
-height: 80px;
-width: 80px;
-border-radius: 20px;
-object-fit: cover;
-`
-const UserName = styled.span`
-font-weight: 400;
-font-size: 13px;
-`
-
 const ProfileRight = ({ user }) => {
-    const [slideindex, setSlideindex] = useState(0)
     const [followers, setFollowers] = useState(true)
     const [followings, setFollowings] = useState(false)
+    const [cls,setCls] = useState("left")
 
     const handleSwitch = (direction) => {
         if (direction === "left") {
             setFollowers(true);
             setFollowings(false)
-            setSlideindex(0)
+            setCls("left")
         } else {
             setFollowings(true);
             setFollowers(false)
-            setSlideindex(100)
+            setCls("right")
         }
     }
 
@@ -97,22 +105,25 @@ const ProfileRight = ({ user }) => {
         <Fragment>
             <Wrapper>
                 <FollowButtons>
-                    <FollowersButton onClick={() => handleSwitch("left")}>Followers</FollowersButton>
+                    {/* <FollowersButton onClick={() => handleSwitch("left")}>Followers</FollowersButton>
                     <FollowingsButton onClick={() => handleSwitch("right")}>Followings</FollowingsButton>
-                    <ButtonColor slideindex={slideindex}></ButtonColor>
+                    <ButtonColor slideindex={slideindex} width={width}></ButtonColor> */}
+                    <FollowersButton onClick={() => handleSwitch("left")}>Followers</FollowersButton>
+                    <FollowingsButton onClick={() =>handleSwitch("right") }>Followings</FollowingsButton>
+                    <ButtonColor className={cls}></ButtonColor>
                 </FollowButtons>
                 <FollowWrapper>
 
                     {followers && <UserFollowers>
-                        {user?.followers?.map((userId)=>
-                        <User userId={userId}/>
+                        {user?.followers?.map((userId) =>
+                            <User userId={userId} key={userId} />
                         )}
- 
+
                     </UserFollowers>
                     }
                     {followings && <UserFollowings>
                         {user?.followings?.map((userId) =>
-                            <User userId={userId}/>
+                            <User userId={userId} key={userId} />
                         )}
                     </UserFollowings>
                     }

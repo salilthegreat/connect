@@ -70,6 +70,7 @@ const UserLocation = styled.span`
 font-size: 10px;
 font-weight: 200;
 `
+
 const FollowButton = styled.a`
   padding: 5px;
   border-radius: 5px;
@@ -114,6 +115,7 @@ const FeedRightbar = () => {
         
         }
         Suggestions()
+        // eslint-disable-next-line
       },[])
 
       const handleFollow = (userId) => {
@@ -143,12 +145,12 @@ const FeedRightbar = () => {
                     <SearchOutlined style={{ height: '22px', color: "gray", position: "absolute", right: "10px", }} />
                 </SearchWrapper>
                 <UserSection>
-                    {suggestion.map((friend)=>(
-                    <UserProfile>
+                    {suggestion.filter((f)=>f._id !== currentUser._id).map((friend)=>(
+                    <UserProfile key={friend._id}>
                         <ProfilePic src={friend?.profilePicture ? friend.profilePicture : "http://localhost:5000/static/profilePic.png" } onClick={()=>navigate(`/profile/${friend._id}`)} />
                         <Details>
                             <UserName onClick={()=>navigate(`/profile/${friend._id}`)}>{friend.userName}</UserName>
-                            <UserLocation>Manchestar,Portugal</UserLocation>
+                            <UserLocation>{friend?.currentCity}{friend.currentCity && friend.country &&<span>,</span>}<UserLocation>{friend.country}</UserLocation></UserLocation>
                         </Details>
                         <FollowButton onClick={()=>handleFollow(friend._id)}>{currentUser?.followings.includes(friend._id) ? "Unfollow" :"Follow"}</FollowButton>
                     </UserProfile>

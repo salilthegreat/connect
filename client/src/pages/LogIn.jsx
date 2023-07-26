@@ -154,9 +154,10 @@ const LogIn = () => {
 
   useEffect(()=>{
     currentUser && toast("Login Successful")
-    currentUser && setTimeout(()=>{
-      window.location.reload()
-    },1000)
+    // currentUser && setTimeout(()=>{
+    //   window.location.reload()
+    // },1000)
+    currentUser && window.location.reload()
   },[currentUser])
 
   const handleLogin =  (e) => {

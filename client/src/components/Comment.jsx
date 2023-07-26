@@ -112,7 +112,7 @@ const Comment = ({ comment }) => {
     const handleDelete = () => {
         DeleteComment(dispatch,data)
     }
-    console.log(currentUser?._id,post?.userId)
+
     
     return (
         <Fragment>

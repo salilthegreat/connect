@@ -2,7 +2,7 @@ import { Cancel, GifBox, Image, VideoLibrary } from '@mui/icons-material'
 import React, { Fragment, useState } from 'react'
 import { styled } from 'styled-components'
 import { NewPost } from '../redux/postApiCalls'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {  userRequest } from '../requestMetohd'
 
 const MainDiv = styled.div`
@@ -90,6 +90,7 @@ height: 300px;
 object-fit: contain;`
 
 const CreatePost = () => {
+    const {currentUser} = useSelector((state)=>state.user)
     const[uploading,setUploading] = useState(false)
     const validPost = new RegExp(/^\S/)
     const [file, setFile] = useState(null)
@@ -126,7 +127,7 @@ const CreatePost = () => {
         <Fragment>
             <MainDiv>
                 <Top>
-                    <ProfilePic src='https://images.unsplash.com/photo-1602442787305-decbd65be507?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80'></ProfilePic>
+                    <ProfilePic src={currentUser?.profilePicture ? currentUser.profilePicture : "http://localhost:5000/static/profilePic.png"}></ProfilePic>
                     <PostDesc name='description' value={post.description} onChange={(e) => setPost((prev) => ({ ...prev, [e.target.name]: e.target.value }))} placeholder={"What's on your mind..."}></PostDesc>
                 </Top>
                 {file && <ImgContainer>

@@ -136,7 +136,7 @@ const ImageWrapper = styled.div`
 const Image = styled.img`
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 10px;
 
   transition: all 1s ease-in-out;
@@ -316,7 +316,7 @@ const Post = ({ item }) => {
           </InputWrapper>
         )}
         {item?.img && <ImageWrapper>
-          <Image src={item?.img} ></Image>
+          <Image src={item?.img} loading="lazy" />
         </ImageWrapper>}
         <Bottom>
           <BottomHolder onClick={()=>handleLike(item?._id)}>
@@ -351,7 +351,7 @@ const Post = ({ item }) => {
           {showComments && (
             <CommentGroup>
               {comments.map((comment) => (
-                <Comment comment={comment} />
+                <Comment comment={comment}key={comment._id}/>
               ))}
             </CommentGroup>
           )}

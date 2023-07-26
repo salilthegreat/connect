@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, {  useEffect, useState } from 'react'
 import { styled } from 'styled-components'
 import { userRequest } from '../requestMetohd'
 import { useDispatch } from 'react-redux'
@@ -42,7 +42,7 @@ const User = ({userId}) => {
     return (
         <>
             <Users>
-                <UserPic src={user?.profilePicture ? user.profilePicture : "http://localhost:5000/static/profilePic.png"} onClick={()=>navigate(`/profile/${user?._id}`)}/>
+                <UserPic src={user?.profilePicture ? user.profilePicture : "http://localhost:5000/static/profilePic.png"} loading="lazy" onClick={()=>navigate(`/profile/${user?._id}`)}/>
                 <UserName onClick={()=>navigate(`/profile/${user?._id}`)}>{user?.userName}</UserName>
             </Users>
         </>

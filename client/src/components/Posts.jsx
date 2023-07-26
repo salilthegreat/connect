@@ -15,8 +15,7 @@ const Posts = ({profile}) => {
 
     useEffect(() => {
        profile ? ProfilePosts(dispatch,params?.userId) : FeedPosts(dispatch,params?.userId)
-    }, [params,dispatch]);
-    console.log(profile,params.userId)
+    }, [params]);
     return (
         <Fragment>
             <CreatePost />

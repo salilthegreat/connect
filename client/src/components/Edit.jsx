@@ -129,8 +129,8 @@ const Edit = () => {
     setOpen(!open);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    // e.preventDefault();
     setUploading(true)
 
     if (profilePicture) {
@@ -142,7 +142,6 @@ const Edit = () => {
       try {
         const res = await userRequest.post("/upload", data)
         UpdateUser(dispatch, currentUser?._id, { profilePicture: res.data.file })
-        console.log("1st upload")
       } catch (error) {
         console.log(error)
         setUploading(false)
@@ -157,7 +156,6 @@ const Edit = () => {
       try {
         const res = await userRequest.post('/upload', data);
         UpdateUser(dispatch, currentUser?._id, { coverPicture: res.data.file })
-        console.log("2nd upload")
       } catch (error) {
         console.log(error)
         setUploading(false)
@@ -170,7 +168,6 @@ const Edit = () => {
     window.location.reload()
   }
 
-  console.log(updateData)
   return (
     <ModalContainer>
       <Trigger onClick={openModal}>
@@ -179,7 +176,7 @@ const Edit = () => {
       {open && (
         <ModalHolder >
           <Modal>
-            <Form >
+            <Form onSubmit={ handleSubmit}>
               <PictureWrapper>
                 {coverPicture ? <CoverPic src={URL.createObjectURL(coverPicture)} /> : <CoverPic src={currentUser?.coverPicture ? currentUser.coverPicture : "https://www.solidbackgrounds.com/images/2560x1440/2560x1440-davys-grey-solid-color-background.jpg"} />}
                 <Label htmlFor="coverPicture" >
@@ -197,34 +194,34 @@ const Edit = () => {
               <MultipleInput>
                 <InputWrapper>
                   <Label>First Name</Label>
-                  <Input type="text" name="firstName" placeholder={currentUser.firstName} onChange={(e) => setUpdateData(prev => ({ ...prev, [e.target.name]: e.target.value }))} />
+                  <Input type="text" name="firstName" defaultValue={currentUser.firstName} minLength={1} onChange={(e) => setUpdateData(prev => ({ ...prev, [e.target.name]: e.target.value }))} required />
                 </InputWrapper>
                 <InputWrapper>
                   <Label>Last Name</Label>
-                  <Input type="text" name="lastName" placeholder={currentUser.lastName} onChange={(e) => setUpdateData(prev => ({ ...prev, [e.target.name]: e.target.value }))} />
+                  <Input type="text" name="lastName" defaultValue={currentUser.lastName} minLength={1} onChange={(e) => setUpdateData(prev => ({ ...prev, [e.target.name]: e.target.value }))} required/>
                 </InputWrapper>
               </MultipleInput>
 
               <MultipleInput>
                 <InputWrapper>
                   <Label>Current City</Label>
-                  <Input type="text" name="currentCity" placeholder={currentUser.currentCity} onChange={(e) => setUpdateData(prev => ({ ...prev, [e.target.name]: e.target.value }))} />
+                  <Input type="text" name="currentCity" defaultValue={currentUser.currentCity} minLength={1} onChange={(e) => setUpdateData(prev => ({ ...prev, [e.target.name]: e.target.value }))} required/>
                 </InputWrapper>
                 <InputWrapper>
                   <Label>Country</Label>
-                  <Input type="text" name="country" placeholder={currentUser.country} onChange={(e) => setUpdateData(prev => ({ ...prev, [e.target.name]: e.target.value }))} />
+                  <Input type="text" name="country" defaultValue={currentUser.country} minLength={1} onChange={(e) => setUpdateData(prev => ({ ...prev, [e.target.name]: e.target.value }))} required/>
                 </InputWrapper>
               </MultipleInput>
 
               <MultipleInput single={"single"}>
                 <InputWrapper>
                   <Label>Profession</Label>
-                  <Input type="text" name="profession" placeholder={currentUser.profession} onChange={(e) => setUpdateData(prev => ({ ...prev, [e.target.name]: e.target.value }))} />
+                  <Input type="text" name="profession" defaultValue={currentUser.profession} minLength={1} onChange={(e) => setUpdateData(prev => ({ ...prev, [e.target.name]: e.target.value }))} required/>
                 </InputWrapper>
               </MultipleInput>
               <Buttons>
                 <ActionButton bgcolor="grey" color="white" onClick={closeModal}>Cancel<Cancel style={{ height: "14px", color: "white" }} /></ActionButton>
-                <ActionButton onClick={(e) => handleSubmit(e)}> {uploading ? "Updating" : "Update"}<DownloadDone style={{ height: "14px", color: "black" }} /></ActionButton>
+                <ActionButton type="submit"> {uploading ? "Updating" : "Update"}<DownloadDone style={{ height: "14px", color: "black" }} /></ActionButton>
               </Buttons>
             </Form>
           </Modal>
