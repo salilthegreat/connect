@@ -24,7 +24,11 @@ export const UserSlice = createSlice({
         signUpSuccess: (state, action) => {
             state.error = null;
             state.loading = false;
-            state.signUpRes = action.payload
+            state.currentUser = action.payload;
+            state.signUpRes = !null
+        },
+        signUpComplete:(state)=>{
+            state.signUpRes = null;
         },
         logOut: (state) => {
             state.currentUser = null;

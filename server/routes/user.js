@@ -44,6 +44,12 @@ router.get("/findsorted", verifyToken, async (req, res) => {
 //UPDATE USER
 router.put("/update/:userId", verifyTokenAndAuthorization, async (req, res) => {
     try {
+       if (req.body.userName) {
+            const user = await User.findOne({userName:req.body.userName});
+            if(user) {
+              return res.status(401).json("Username already taken")
+            }         
+        }
         if (req.body.password) {
             req.body.password = await bcrypt.hash(req.body.password, 10);
         }

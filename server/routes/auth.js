@@ -6,16 +6,17 @@ const router = require("express").Router();
 
 //REGISTER
 router.post("/register", async (req, res) => {
-    const { userName, email, firstName, lastName, password } = req.body;
-    let user = await User.findOne({ userName });
-    if (user) return res.status(401).json("Username already taken")
-    user = await User.findOne({ email });
-    if (user) return res.status(403).json("Email already Taken")
+    const {  email, password } = req.body;
+    // let user = await User.findOne({ userName });
+    // if (user) return res.status(401).json("Username already taken")
+     let user = await User.findOne({ email });
+    if (user) return res.status(401).json("Email already Taken")
     try {
         const hashedPassword = await bcrypt.hash(password, 10)
         const newUser = new User({ ...req.body, password: hashedPassword });
         const savedUser = await newUser.save();
-        res.status(200).json(savedUser)
+        const accessToken = createAccessToken({userId:savedUser._id,isAdmin:savedUser.isAdmin})
+        res.status(200).json({...savedUser._doc,accessToken})
     } catch (error) {
         res.status(500).json(error.message)
     }

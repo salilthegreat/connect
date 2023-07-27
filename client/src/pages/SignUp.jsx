@@ -8,86 +8,81 @@ import 'react-toastify/dist/ReactToastify.css';
 import { refreshState } from "../redux/UserSlice"
 
 
-const Navbar = styled.nav`
-height: 50px;
-color: white;
-background-color: black;
+
+
+const Container = styled.div`
 display: flex;
+height: 100vh;
+padding: 5rem 9.75rem;
+justify-content: center;
 align-items: center;
-font-weight: 700;
-font-size: 30px;
-`
-
-const Maindiv = styled.div`
-height: calc(100vh - 50px);
-background-color: whitesmoke;
-padding: 80px;
+background: #FFF;
 box-sizing: border-box;
-
-`
-const ContainerDiv = styled.div`
-display: flex;
-border: 4px solid white;
-border-radius: 15px;
-height: 100%;
-position: relative;
 `
 
+const HeroDiv = styled.div`
+  display: flex;
+  /* justify-content: space-between; */
+  width: 100%;
+  height: 100%;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+`
 const Leftdiv = styled.div`
-flex: 0.8;
-background-color: transparent;
-z-index: 2;
-`
-const ImgHolder = styled.div`
- z-index: 5;
-`
-
-const TopImg = styled.img`
-transform: scaleX(-1);
-height: 80%;
-position: absolute;
-top: 88px;
-
-`
-
-const Rightdiv = styled.div`
-flex:1.2;
-background-color: white;
-z-index: 2;
+flex: 1 ;
+/* background-color: red; */
 display: flex;
 flex-direction: column;
 justify-content: center;
 align-items: center;
+border-right: 1px solid var(--border-blue);
 `
 
 const Heading = styled.h1`
-  font-weight: 600;
-  font-size: 50px;
-`
+&.left{
+  font-weight: 700;
+  font-size: 48px;
+  color: var(--primary-blue);
+    position: absolute;
+  top: 57%;
+}
+
+&.right{
+  font-weight: 700;
+  font-size: 48px;
+  color: var(--primary-blue);
+
+}
+  `
 const Subtitle = styled.p`
-padding: 10px;
-font-weight: 300;
-font-size: 15px;
+margin: 12px 0;
+font-weight: 500;
+font-size: 14px;
 `
 const Form = styled.form`
-padding-top: 20px;
-`
-const InputWrapper = styled.div`
+width: 60%;
 display: flex;
 flex-direction: column;
-margin: 10px;
+align-items: center;
+`
+const InputWrapper = styled.div`
+width: 100%;
+display: flex;
+flex-direction: column;
+margin-bottom: 10px;
 justify-content: space-between;
 `
-const InputWrapperFlex = styled.div`
-display:flex;
 
-`
 
 const Label = styled.label`
-margin-bottom: 5px;
-font-weight: 500;
-font-size: 10px;
+margin-bottom: 8px;
+font-weight: 700;
+font-size: 14px;
+
+/* label.required:after{content:"*"} */
 `
+const RequiredSpan = styled.span`
+  color: red;
+  `
 
 const Input = styled.input`
 border: 0.5px solid gray;
@@ -95,51 +90,78 @@ padding: 10px 20px;
 width: 200px;
 outline: none;
 border-radius: 5px;
-font-size: 11px;
-font-weight: 300;
+font-size: 14px;
+font-weight: 400;
+align-self: stretch;
+width: 100%;
+box-sizing: border-box;
 `
-const ErrorMsgDiv = styled.div`
+const ErrorMsg = styled.div`
   color: red;
-  text-align: center;
-  font-weight: 400;
   font-size: 11px;
-`
+  font-weight: 400;
+  text-align: center;
+  `
 
 const ButtonWrapper = styled.div`
-padding: 15px;
+margin: 15px 0px;
 text-align: center;
+width: 100%;
 `
 
 const Button = styled.button`
+/* width: 100%; */
 padding: 10px 0px ;
 border: none;
-border-radius: 15px;
+border-radius: 10px;
 font-weight: 400;
-background-color: lightgray;
-width: 95%;
+font-size: 14px;
+background-color: var(--secondary-blue);
+color: #FFFFFF;
+width: 100%;
+cursor: pointer;
 &:hover{
-  background-color: lightgrey;
+  background-color: var(--tertiary-blue);
+}
+&:active{
+  transform: scale(0.9);
 }
 `
-const SignUpMsg = styled.p`
-    font-size: 13px;
-    font-weight: 400;
-`
 
+const SignUpMsg = styled.p`
+    margin-top: 5px;
+    font-size: 14px;
+    font-weight: 400;
+    `
 const Span = styled.span`
-    color: blue;
+    color: var(--secondary-blue);
+    cursor: pointer;
+    font-weight: 800;
+    `
+
+const Rightdiv = styled.div`
+    flex:1 ;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    position: relative;
+    `
+
+const Logo = styled.img`
+  width: 240px;
+  mix-blend-mode: darken;
+
 `
 
 const Signup = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { loading, error, signUpRes } = useSelector((state) => state.user)
+  const { loading, error, currentUser } = useSelector((state) => state.user)
 
   const [userCredentials, setUserCredentials] = useState({
-    userName: "",
     email: "",
-    firstName: "",
-    lastName: "",
     password: ""
   })
 
@@ -153,77 +175,56 @@ const Signup = () => {
     SignUp(dispatch, userCredentials)
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(refreshState())
     // eslint-disable-next-line
-  },[])
+  }, [])
 
   useEffect(() => {
-    signUpRes && toast("Sign Up Successful")
-    signUpRes && setTimeout(()=>{
-      navigate("/")
-    },1500)
+    currentUser && toast("Sign Up Successful")
+    currentUser && setTimeout(() => {
+      navigate("/setup")
+    }, 1500)
     // eslint-disable-next-line
-  },[signUpRes])
+  }, [currentUser])
+
+  console.log(JSON.parse(JSON.parse(localStorage.getItem("persist:root")).user)?.signUpRes )
 
   return (
     <Fragment>
-      <Navbar>
-        Connect
-      </Navbar>
-      <Maindiv>
-        <ImgHolder>
-          <TopImg src="https://cdn.pixabay.com/photo/2014/04/09/17/48/man-320276_1280.png" alt="" />
-        </ImgHolder>
-        <ContainerDiv>
+      <Container>
+        <HeroDiv>
           <Leftdiv>
+            <Logo src="https://i.ibb.co/tX4fmGf/Whats-App-Image-2023-07-03-at-11-18-12.jpg" />
+            <Heading className="left">Connect</Heading>
           </Leftdiv>
           <Rightdiv>
-            <Heading>Hi there!</Heading>
+            <Heading className="right">Signup</Heading>
             <Subtitle>Welcome to Connect. Meet with people around the world🙂 </Subtitle>
             <Form onSubmit={handleSignUp}>
-                  {error && <ErrorMsgDiv> {(error === 401) && "Username already taken"}</ErrorMsgDiv>}
-                  {error && <ErrorMsgDiv> {(error === 403) && "Email already taken"}</ErrorMsgDiv>}
-              <InputWrapperFlex>
-                <InputWrapper>
-                  <Label>Username</Label>
-                  <Input type="text" name="userName" placeholder="john768" onChange={handleChange} required minLength={5}></Input>
-                </InputWrapper>
-                <InputWrapper>
-                  <Label>Email</Label>
-                  <Input type="email" name="email" placeholder="johndoe@gmail.com" onChange={handleChange} required ></Input>
-                </InputWrapper>
-              </InputWrapperFlex>
-              <InputWrapperFlex>
-                <InputWrapper>
-                  <Label>First Name</Label>
-                  <Input type="text" name="firstName" placeholder="John" onChange={handleChange} required minLength={3}></Input>
-                </InputWrapper>
-                <InputWrapper>
-                  <Label>Last Name</Label>
-                  <Input type="text" name="lastName" placeholder="Doe" onChange={handleChange} required minLength={3}></Input>
-                </InputWrapper>
-              </InputWrapperFlex>
-              <InputWrapperFlex>
-                <InputWrapper>
-                  <Label>Password</Label>
-                  <Input type="password" name="password" placeholder="password" onChange={handleChange} required minLength={5}></Input>
-                </InputWrapper>
-                <InputWrapper>
-                  <Label>Confirm Password</Label>
-                  <Input type="password" placeholder="confirm password" required minLength={5}></Input>
-                </InputWrapper>
-              </InputWrapperFlex>
-                  {error && <ErrorMsgDiv> {(error === 500) && "Something went wrong!"}</ErrorMsgDiv>}
+              {error && <ErrorMsg> {(error === 401) && "Email already taken"}</ErrorMsg>}
+              <InputWrapper>
+                <Label>Email<RequiredSpan>*</RequiredSpan></Label>
+                <Input type="email" name="email" placeholder="johndoe@gmail.com" onChange={handleChange} required ></Input>
+              </InputWrapper>
+              <InputWrapper>
+                <Label>Password<RequiredSpan>*</RequiredSpan></Label>
+                <Input type="password" name="password" placeholder="password" onChange={handleChange} required minLength={5}></Input>
+              </InputWrapper>
+              <InputWrapper>
+                <Label>Confirm Password<RequiredSpan>*</RequiredSpan></Label>
+                <Input type="password" placeholder="confirm password" required minLength={5}></Input>
+              </InputWrapper>
+              {error && <ErrorMsg> {(error === 500) && "Something went wrong!"}</ErrorMsg>}
               <ButtonWrapper>
-                <Button type="submit"> {loading ? "Loading" : "Sign Up" }</Button>
+                <Button type="submit"> {loading ? "Loading" : "Sign Up"}</Button>
               </ButtonWrapper>
             </Form>
-            <SignUpMsg>Already have an account? <Span><Link to={"/"}>Login</Link></Span> </SignUpMsg>
+            <SignUpMsg>Already have an account? <Link to={"/"}><Span>Login</Span></Link> </SignUpMsg>
           </Rightdiv>
           <ToastContainer />
-        </ContainerDiv>
-      </Maindiv>
+        </HeroDiv>
+      </Container>
     </Fragment>
   )
 }
