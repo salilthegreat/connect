@@ -1,5 +1,4 @@
 //FETCH ALL POSTS
-
 import { userRequest } from "../requestMetohd";
 import { createComment, createPostSuccess, deleteComment, deletePost, fetchingPostSuccess, postApiCallStart, postDisliked, postLiked, updatePost } from "./PostSlice"
 import { apiCallStart } from "./UserSlice";
@@ -75,6 +74,17 @@ export const LikePost = async(dispatch,postId,userId) =>{
     }
 }
 
+//CREATE LIKE/FOLLOW NOTIFICATION
+export const LikeFollowNotification = async(dispatch,data)=>{
+    dispatch(apiCallStart);
+    try {
+        const res = await userRequest.post(`/notifications/likefollow`,data);
+        console.log(res.data)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 //CREATE A COMMENT
 export const CreateComment = async(dispatch,postId,userId,comment) => {
     dispatch(apiCallStart);
@@ -82,6 +92,18 @@ export const CreateComment = async(dispatch,postId,userId,comment) => {
         const res = await userRequest.post(`/comments/${postId}/${userId}`,comment);
         dispatch(createComment({postId,commentId:res.data._id}))
 
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+//CREATE COMMENT NOTIFICATION
+
+export const CommentNotification = async(dispatch,data)=>{
+    dispatch(apiCallStart)
+    try {
+        const res = await userRequest.post(`/notifications/comment`,data)
+        console.log(res.data)
     } catch (error) {
         console.log(error)
     }

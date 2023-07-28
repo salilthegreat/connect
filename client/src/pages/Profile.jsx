@@ -11,6 +11,7 @@ import { userRequest } from "../requestMetohd";
 import { apiCallStart } from "../redux/UserSlice";
 import { Follow, UpdateUser } from "../redux/apiCalls";
 import Edit from "../components/Edit";
+import { LikeFollowNotification } from "../redux/postApiCalls";
 
 
 const Container = styled.div`
@@ -157,6 +158,12 @@ const Profile = () => {
   // console.log(JSON.parse(JSON.parse(localStorage.getItem("persist:root")).user).currentUser.accessToken)
   const handleFollow = () => {
     Follow(dispatch, params.userId)
+    const data = {
+      type:"followed",
+      senderId:currentUser?._id,
+      recieverId:params.userId,
+    }
+    LikeFollowNotification(dispatch,data)
   }
 
   const handleConversation = async () => {

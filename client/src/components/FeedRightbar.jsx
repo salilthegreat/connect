@@ -43,6 +43,7 @@ const UserProfile = styled.div`
 display: flex;
 column-gap: 40px;
 align-items: center;
+justify-content: space-between;
 padding: 10px;
 -webkit-box-shadow: 0px -1px 16px -3px #6b6a6a; 
     border-radius: 10px;

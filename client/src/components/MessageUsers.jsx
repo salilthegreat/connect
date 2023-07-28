@@ -45,7 +45,7 @@ const MessageUsers = ({ convo }) => {
     return (
         <>
             <Users >
-                <UserImg src={friend?.profilePictur ? friend.profilePictur : 'http://localhost:5000/static/profilePic.png'} />
+                <UserImg src={friend?.profilePicture ? friend.profilePicture : 'http://localhost:5000/static/profilePic.png'} />
                 <UserName>{friend?.userName}</UserName>
             </Users>
         </>

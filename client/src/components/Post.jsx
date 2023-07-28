@@ -14,7 +14,7 @@ import { userRequest } from "../requestMetohd";
 import { useDispatch, useSelector } from "react-redux";
 import { apiCallError } from "../redux/UserSlice";
 import ReactTimeAgo from 'react-time-ago'
-import { CreateComment } from "../redux/postApiCalls";
+import { CommentNotification, CreateComment, LikeFollowNotification } from "../redux/postApiCalls";
 import { DeletePost, LikePost, UpdatePost } from "../redux/postApiCalls";
 import { useNavigate } from "react-router-dom";
 
@@ -256,16 +256,30 @@ const Post = ({ item }) => {
     setShowInput(!showInput)
   }
 
-  const handleComment = (postId) => {
+  const handleComment = (postId,recieverId) => {
     CreateComment(dispatch, postId, currentUser?._id, comment)
     setComment({
       comment: ""
     })
+    const data = {
+      type:"commented",
+      senderId:currentUser?._id,
+      recieverId,
+      postId
+    }
+    CommentNotification(dispatch,data)
   }
 
-  const handleLike = (postId)=>{
-    LikePost(dispatch,postId,currentUser?._id)
+  const handleLike = (postId,recieverId)=>{
     setLiked(!liked)
+    LikePost(dispatch,postId,currentUser?._id)
+    const data = {
+      type:"liked",
+      senderId:currentUser?._id,
+      recieverId,
+      postId
+    }
+    LikeFollowNotification(dispatch,data)
   }
 
   return (
@@ -319,7 +333,7 @@ const Post = ({ item }) => {
           <Image src={item?.img} loading="lazy" />
         </ImageWrapper>}
         <Bottom>
-          <BottomHolder onClick={()=>handleLike(item?._id)}>
+          <BottomHolder onClick={()=>handleLike(item?._id,item?.userId)}>
             {liked ? (
               <Favorite
                 style={{ marginRight: "5Px", height: "18px", color: "grey" }}
@@ -345,7 +359,7 @@ const Post = ({ item }) => {
             <Input type="text" name="comment" placeholder="Write a comment..." value={comment.comment} onChange={(e) => setComment({ [e.target.name]: e.target.value })} />
             <Send
               style={{ marginRight: "5Px", height: "18px", color: "grey" }}
-              onClick={() => handleComment(item?._id)}
+              onClick={() => handleComment(item?._id,item?.userId)}
             />
           </CurrentUserComment>
           {showComments && (
