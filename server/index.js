@@ -10,6 +10,7 @@ const postRoute = require("./routes/post")
 const commentRoute = require("./routes/comment")
 const conversationRoute = require("./routes/conversation")
 const messageRoute = require("./routes/message")
+const notificationRoute = require("./routes/notification")
 
 //imports for cloudinary
 const cloudinary = require("cloudinary").v2;
@@ -65,6 +66,7 @@ app.use("/api/posts", postRoute)
 app.use("/api/comments", commentRoute)
 app.use("/api/conversations", conversationRoute)
 app.use("/api/messages", messageRoute)
+app.use("/api/notifications",notificationRoute)
 
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log("DB connected successfully")
