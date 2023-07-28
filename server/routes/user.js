@@ -17,6 +17,37 @@ router.get("/find/:userId", verifyToken, async (req, res) => {
 
 })
 
+// GET USER EXCEPT THE CURRENTUSER AND THEIR FOLLOWINGS
+router.get("/findusers", verifyToken, async (req, res) => {
+    try {
+        const currentUser = await User.findById(req.user.userId).select('followings'); //followings with id
+        const followingIds = currentUser.followings; //only followings of currentuser
+        const usersNotFollowing = await User.find({ _id: { $nin: followingIds.concat([req.user.userId])}}).limit(6); //find users which are not included in following list and currentuser
+        res.status(200).json(usersNotFollowing);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
+
+//SEARCH USER THROUGH API CALL
+router.get("/search",verifyToken,async(req,res)=>{
+    try {
+        const {q} = req.query;
+        const filterdSearch = {
+            $or:[
+                {firstName:{$regex:q,$options:"i"}}, //search for firstname and  case insensitiv
+                {lastName:{$regex:q,$options:"i"}},
+                {userName:{$regex:q,$options:"i"}}
+            ],
+            _id:{$ne:req.user.userId} //excluding the currentuserId from the search
+        }
+        const searchUser = await User.find(filterdSearch)
+        res.status(200).json(searchUser)
+    } catch (error) {
+        res.status(500).json(error)
+    }
+})
+
 //GET ALL USERS
 router.get("/findall", verifyToken, async (req, res) => {
     try {
@@ -32,13 +63,19 @@ router.get("/findsorted", verifyToken, async (req, res) => {
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
     const skipIndex = (page - 1) * limit;
-    try {
-        const result = await User.find().sort({ _id: 1 }).limit(limit).skip(skipIndex).exec();
-        res.status(200).json(result)
-    } catch (error) {
-        res.status(500).json(error)
-    }
 
+    try {
+        const currentUser = await User.findById(req.user.userId).select('followings');
+        const followingIds = currentUser.followings;
+        const usersNotFollowing = await User.find({ _id: { $nin: followingIds.concat([req.user.userId])}}).skip(skipIndex).limit(limit).exec();
+        // if(usersNotFollowing.length === 0){
+        //     return res.status(201).json("No More Suggestions to show")
+        // }
+        res.status(200).json(usersNotFollowing);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+    
 })
 
 //UPDATE USER

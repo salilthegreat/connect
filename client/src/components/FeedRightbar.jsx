@@ -4,7 +4,7 @@ import { SearchOutlined } from '@mui/icons-material'
 import { useDispatch, useSelector } from 'react-redux'
 import { apiCallStart } from '../redux/UserSlice'
 import { userRequest } from '../requestMetohd'
-import {Follow} from "../redux/apiCalls"
+import { Follow } from "../redux/apiCalls"
 import { useNavigate } from 'react-router-dom'
 
 const Wrapper = styled.div`
@@ -96,71 +96,75 @@ const ShowMoreButton = styled.button`
 `
 
 const FeedRightbar = () => {
-  const {currentUser} = useSelector((state)=>state.user)
-  const [suggestion,setSuggestion] = useState([])
+  const { currentUser } = useSelector((state) => state.user)
+  const [suggestion, setSuggestion] = useState([])
+  const [query, setQuery] = useState("")
   const navigate = useNavigate()
-  const [page,setPage] = useState(1)
+  const [page, setPage] = useState(1)
   // const [following,setFollowing] = useState(false)
 
-    const dispatch = useDispatch()
+  const dispatch = useDispatch()
 
-    useEffect(()=>{
-         const Suggestions = async()=>{
-            dispatch(apiCallStart());
-            try {
-                const res = await userRequest.get(`/users/findsorted?page=${1}&limit=5`);
-                setSuggestion(res.data)
-            } catch (error) {
-                console.log(error)
-            }
-        
-        }
-        Suggestions()
-        // eslint-disable-next-line
-      },[])
+  useEffect(() => {
+    const Suggestions = async () => {
+      dispatch(apiCallStart());
+      try {
 
-      const handleFollow = (userId) => {
-        Follow(dispatch,userId)
+        const res = (query.length > 2) ? await userRequest.get(`/users/search?q=${query}`) : await userRequest.get(`/users/findsorted?page=${1}&limit=5`);
+        console.log(res.data)
+        setSuggestion(res.data)
+      } catch (error) {
+        console.log(error)
       }
 
-      const handleShowMore = async() =>{
+    }
+    Suggestions()
+    // eslint-disable-next-line
+  }, [query])
 
-          dispatch(apiCallStart);
-          try {
-            const res = await userRequest.get(`/users/findsorted?page=${page + 1}&limit=5`)
-            setSuggestion(res.data)
-            setPage(page + 1)
-          } catch (error) {
-            console.log(error)
-          }
-      }
+  const handleFollow = (userId) => {
+    Follow(dispatch, userId)
+  }
 
-    return (
-        <Fragment>
-            <Wrapper>
-                <Heading>
-                    Suggestion for you
-                </Heading>
-                <SearchWrapper>
-                    <Search placeholder='Search for friends...' />
-                    <SearchOutlined style={{ height: '22px', color: "gray", position: "absolute", right: "10px", }} />
-                </SearchWrapper>
-                <UserSection>
-                    {suggestion.filter((f)=>f._id !== currentUser._id).map((friend)=>(
-                    <UserProfile key={friend._id}>
-                        <ProfilePic src={friend?.profilePicture ? friend.profilePicture : "http://localhost:5000/static/profilePic.png" } onClick={()=>navigate(`/profile/${friend._id}`)} />
-                        <Details>
-                            <UserName onClick={()=>navigate(`/profile/${friend._id}`)}>{friend.userName}</UserName>
-                            <UserLocation>{friend?.currentCity}{friend.currentCity && friend.country &&<span>,</span>}<UserLocation>{friend.country}</UserLocation></UserLocation>
-                        </Details>
-                        <FollowButton onClick={()=>handleFollow(friend._id)}>{currentUser?.followings.includes(friend._id) ? "Unfollow" :"Follow"}</FollowButton>
-                    </UserProfile>
-                    ))}
-                </UserSection>
-                <ShowMoreButton onClick={handleShowMore}>Show More</ShowMoreButton>
-            </Wrapper>
-        </Fragment>
-    )
+  const handleShowMore = async () => {
+
+    dispatch(apiCallStart);
+    try {
+      const res = await userRequest.get(`/users/findsorted?page=${page + 1}&limit=5`)
+      console.log(res.data, res.status)
+      setSuggestion(res.data)
+      setPage(page + 1)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  return (
+    <Fragment>
+      <Wrapper>
+        <Heading>
+          Suggestion for you
+        </Heading>
+        <SearchWrapper>
+          <Search placeholder='Search for friends...' onChange={(e) => setQuery(e.target.value)} />
+          <SearchOutlined style={{ height: '22px', color: "gray", position: "absolute", right: "10px", }} />
+        </SearchWrapper>
+        <UserSection>
+          {suggestion.map((friend) => (
+            <UserProfile key={friend._id}>
+              <ProfilePic src={friend?.profilePicture ? friend.profilePicture : "http://localhost:5000/static/profilePic.png"} onClick={() => navigate(`/profile/${friend._id}`)} />
+              <Details>
+                <UserName onClick={() => navigate(`/profile/${friend._id}`)}>{friend.firstName}  {friend.lastName}</UserName>
+                <UserLocation>{friend?.currentCity}{friend.currentCity && friend.country && <span>,</span>}<UserLocation>{friend.country}</UserLocation></UserLocation>
+              </Details>
+              <FollowButton onClick={() => handleFollow(friend._id)}>{currentUser?.followings.includes(friend._id) ? "Unfollow" : "Follow"}</FollowButton>
+            </UserProfile>
+          ))}
+        </UserSection>
+        <ShowMoreButton onClick={handleShowMore}>Show More</ShowMoreButton>
+      </Wrapper>
+    </Fragment>
+  )
 }
 
 export default FeedRightbar
