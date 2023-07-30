@@ -7,7 +7,7 @@ import { apiCallStart } from '../redux/UserSlice'
 import { userRequest } from '../requestMetohd'
 import MessageUsers from '../components/MessageUsers'
 import MessageBubbles from '../components/MessageBubbles'
-import {io} from "socket.io-client"
+import { io } from "socket.io-client"
 import OnlineUsers from '../components/OnlineUsers'
 
 const Container = styled.div`
@@ -52,7 +52,25 @@ outline: none;
 font-weight: 400;
 font-size: 13px;
 `
+const Users = styled.div`
+display: flex;
+align-items: center;
+gap: 30px;
+`
 
+const UserImg = styled.img`
+height: 40px;
+width: 40px;
+border-radius: 50%;
+object-fit: cover;
+cursor: pointer;
+`
+
+const UserName = styled.span`
+font-size: 15px;
+font-weight: 400;
+cursor: pointer;
+`
 const UserProfiles = styled.div`
 margin-top: 20px;
 display: flex;
@@ -145,50 +163,66 @@ overflow-y: scroll;
 
 
 const Message = () => {
-    
+
     const dispatch = useDispatch();
     const { currentUser } = useSelector((state) => state.user)
     const [conversation, setConversation] = useState(null)
-    const [chat,setChat] = useState([])
+    const [chat, setChat] = useState([])
     const [conversations, setConversations] = useState([])
-    const[socketMessage,setSocketMessage] = useState(null)
-    const[onlineUser,setOnlineUser] = useState([])
-    const [newMessage,setNewMessage] = useState({
-        conversationId:"",
-        senderId:currentUser._id,
-        message:""
+    const [socketMessage, setSocketMessage] = useState(null)
+    const [onlineUser, setOnlineUser] = useState([])
+    const [newMessage, setNewMessage] = useState({
+        conversationId: "",
+        senderId: currentUser._id,
+        message: ""
     })
     const scrollRef = useRef()
-   const socket = useRef(null)
+    const socket = useRef(null)
+    const [query, setQuery] = useState("")
+    const [searchedUser, setSearchedUser] = useState([])
 
-    useEffect(()=>{
+
+
+
+    useEffect(() => {
         socket.current = io("ws://localhost:8900")
-        socket.current.on("getMessage",(data)=>{
-            setSocketMessage( {
-                conversationId:setNewMessage.conversationId,
-                senderId:data.senderId,
-                message:data.message,
-                createdAt:Date.now()
+        socket.current.on("getMessage", (data) => {
+            setSocketMessage({
+                conversationId: setNewMessage.conversationId,
+                senderId: data.senderId,
+                message: data.message,
+                createdAt: Date.now()
             })
-            
-        })
-    },[])
 
-    
-    useEffect(()=>{
-        // console.log(socketMessage,"aap")
-        // console.log(conversation,"app2")
+        })
+    }, [])
+
+    //Get searched user from query
+    useEffect(() => {
+        const QuerySearch = async () => {
+
+            try {
+                const res = (query.length > 1) && await userRequest.get(`/users/msgsearch?q=${query}`);
+                setSearchedUser(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        QuerySearch();
+    }, [query])
+
+    useEffect(() => {
         conversation?.members.includes(socketMessage?.senderId) &&
-        setChat(prev=>[...prev,socketMessage])
+            setChat(prev => [...prev, socketMessage])
 
-    },[socketMessage,conversation])
+    }, [socketMessage, conversation])
 
-    useEffect(()=>{
-        socket?.current?.emit("addUser",currentUser?._id)
-        socket?.current?.on("getUser",users=>{
-            setOnlineUser(()=> {return users.filter((u)=>u.userId !== currentUser?._id)})
+    useEffect(() => {
+        socket?.current?.emit("addUser", currentUser?._id)
+        socket?.current?.on("getUser", users => {
+            setOnlineUser(() => { return users.filter((u) => u.userId !== currentUser?._id) })
         })
-    },[currentUser])
+    }, [currentUser])
 
 
     //to set the user list at left bar for all the users that the current user has communicated with
@@ -198,70 +232,82 @@ const Message = () => {
             try {
                 const res = await userRequest.get(`/conversations/${currentUser?._id}`);
                 // console.log(res.data)
-                setConversations(res.data.sort((a,b)=> ( new Date(b.createdAt) - new Date(a.createdAt))))
+                setConversations(res.data.sort((a, b) => (new Date(b.createdAt) - new Date(a.createdAt))))
             } catch (error) {
                 console.log(error)
             }
         };
         UserConversation()
-    }, [currentUser,dispatch])
+    }, [currentUser, dispatch, conversations])
 
     //for scrolling of the screen to the current message
 
-    useEffect(()=>{
-        scrollRef.current?.scrollIntoView({behavior:"smooth"})
-    },[chat])
+    useEffect(() => {
+        scrollRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [chat])
 
     //to fetch the messages after the current user clicks on any of the listed user
 
-        const GetMessages = async(convo) => {
-            setConversation(convo) //to find the reciever id in the conversation before sending message
-        
-            setNewMessage((prev)=>({...prev,"conversationId":convo._id}))  //it is set so that we can set up the conversatinid while recieving the message from socket
-            dispatch(apiCallStart());
+    const GetMessages = async (convo) => {
+        setConversation(convo) //to find the reciever id in the conversation before sending message
+
+        setNewMessage((prev) => ({ ...prev, "conversationId": convo._id }))  //it is set so that we can set up the conversatinid while recieving the message from socket
+        dispatch(apiCallStart());
         try {
             const res = await userRequest.get(`/messages/${convo._id}`);
             setChat(res.data)
         } catch (error) {
             console.log(error)
         }
+    }
+
+
+
+    //sending message when clicked on the send
+
+    const handleSend = async () => {
+        const recieverId = conversation?.members?.find((m) => m !== currentUser?._id) //this will be sent to socket server for instant messaging
+        onlineUser.some((user) => user.userId === recieverId) && (
+            socket.current.emit("sendMessage", {
+                senderId: currentUser._id,
+                message: newMessage.message,
+                recieverId
+            })
+        )
+        dispatch(apiCallStart());
+        setNewMessage((prev) => ({ ...prev, "message": "" }))
+        try {
+            const res = await userRequest.post('/messages', newMessage);
+            setChat([...chat, res.data])
+            console.log(res.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    // console.log(onlineUser,"gote")
+
+    const handleOnlineConversation = async (recieverId) => {
+
+        try {
+            const res = await userRequest.get(`/conversations/${currentUser?._id}/${recieverId}`);
+            GetMessages(res.data)
+        } catch (error) {
+            console.log(error)
         }
 
-// console.log(newMessage)
-
-//sending message when clicked on the send
-
-        const handleSend = async() => {
-            const recieverId = conversation?.members?.find((m)=>m!==currentUser?._id) //this will be sent to socket server for instant messaging
-            onlineUser.some((user)=>user.userId === recieverId) &&(
-                socket.current.emit("sendMessage",{
-                    senderId:currentUser._id,
-                    message:newMessage.message,
-                    recieverId
-                })
-            )
-            dispatch(apiCallStart());
-            setNewMessage((prev)=>({...prev,"message":""}))
-            try {
-                const res = await userRequest.post('/messages',newMessage);
-                setChat([...chat,res.data])
-                console.log(res.data)
-            } catch (error) {
-                console.log(error)
-            }
+    }
+    
+    //to create or start a conversation with the searched user
+    const handleSearchConversation = async (userId) => {
+        dispatch(apiCallStart());
+        try {
+            const res = await userRequest.post('/conversations', { senderId: currentUser?._id, recieverId: userId })
+            res && handleOnlineConversation(userId)
+            setQuery("")
+        } catch (error) {
+            console.log(error)
         }
-        // console.log(onlineUser,"gote")
-
-        const handleOnlineConversation = async(recieverId) => {
-            
-            try {
-                const res = await userRequest.get(`/conversations/${currentUser?._id}/${recieverId}`);
-                GetMessages(res.data)
-            } catch (error) {
-                console.log(error)
-            }
-            
-        }
+    }
 
     return (
         <Fragment>
@@ -272,17 +318,27 @@ const Message = () => {
                         <LeftTop>
                             <Header>Recent Chats</Header>
                             <SearchWrapper>
-                                <SearchInput placeholder='Search for friends...' />
+                                <SearchInput placeholder='Search for friends...' onChange={(e) => setQuery(e.target.value)} />
                                 <Search style={{ position: "absolute", right: "55px", height: "15px", color: "gray" }} />
                             </SearchWrapper>
                         </LeftTop>
-                        <UserProfiles >
-                            {conversations.map((convo) => (
-                                <div onClick={()=>GetMessages(convo)}>
-                                <MessageUsers convo={convo} key={convo._id} />
-                                </div>
-                            ))}
-                        </UserProfiles>
+                        {(query.length >1 ) ?
+                            <UserProfiles>
+                                {searchedUser?.map((user) => (<>
+                                    <Users onClick={() => handleSearchConversation(user._id)}>
+                                        <UserImg src={user?.profilePicture ? user.profilePicture : 'http://localhost:5000/static/profilePic.png'} />
+                                        <UserName>{user?.userName}</UserName>
+                                    </Users>
+                                </>))}
+                            </UserProfiles> :
+                            <UserProfiles >
+                                {conversations.map((convo) => (
+                                    <div onClick={() => GetMessages(convo)}>
+                                        <MessageUsers convo={convo} key={convo._id} />
+                                    </div>
+                                ))}
+                            </UserProfiles>
+                        }
                     </LeftWrapper>
                 </Left>
 
@@ -292,14 +348,14 @@ const Message = () => {
                     <MiddleWrapper>
                         {conversation ? <>
                             <MessageTop>
-                                {chat?.map((message)=>( 
+                                {chat?.map((message) => (
                                     <div ref={scrollRef}>
                                         <MessageBubbles message={message} key={message?._id} />
-                                        </div>  
+                                    </div>
                                 ))}
                             </MessageTop>
                             <MessageBottom>
-                                <MessageArea rows={5} name='message' value={newMessage?.message} onChange={(e)=>setNewMessage((prev)=> ({...prev,[e.target.name]:e.target.value}))}/>
+                                <MessageArea rows={5} name='message' value={newMessage?.message} onChange={(e) => setNewMessage((prev) => ({ ...prev, [e.target.name]: e.target.value }))} />
                                 <SendButton onClick={handleSend}>Send</SendButton>
                             </MessageBottom>
                         </>
@@ -311,16 +367,11 @@ const Message = () => {
                         <Header>Online Friends</Header>
                         <OnlineWrapper>
                             <OnlineProfiles>
-                                {onlineUser?.map((user)=>(
+                                {onlineUser?.map((user) => (
                                     <div onClick={() => handleOnlineConversation(user.userId)}>
 
-                                        <OnlineUsers userId={user.userId}/>
+                                        <OnlineUsers userId={user.userId} />
                                     </div>
-                                // <OnlineUser onClick={() => handleOnlineConversation(user.userId)}>
-                                //     <OnlineUserImg src='https://images.unsplash.com/photo-1486486704382-8ee6f7754a45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1776&q=80' />
-                                //     <CircleOnline></CircleOnline>
-                                //     <UserName>Alicia Silverstone</UserName>
-                                // </OnlineUser>
                                 ))}
                             </OnlineProfiles>
                         </OnlineWrapper>

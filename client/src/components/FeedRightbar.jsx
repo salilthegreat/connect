@@ -110,8 +110,8 @@ const FeedRightbar = () => {
       dispatch(apiCallStart());
       try {
 
-        const res = (query.length > 2) ? await userRequest.get(`/users/search?q=${query}`) : await userRequest.get(`/users/findsorted?page=${1}&limit=5`);
-        console.log(res.data)
+        const res = (query.length > 1) ? await userRequest.get(`/users/search?q=${query}`) : await userRequest.get(`/users/findsorted?page=${1}&limit=5`);
+        // console.log(res.data)
         setSuggestion(res.data)
       } catch (error) {
         console.log(error)
@@ -138,7 +138,6 @@ const FeedRightbar = () => {
       console.log(error)
     }
   }
-
   return (
     <Fragment>
       <Wrapper>

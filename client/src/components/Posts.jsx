@@ -1,26 +1,36 @@
-import React, { Fragment, useEffect, } from 'react'
+import React, { Fragment, useEffect, useState, } from 'react'
 import CreatePost from './CreatePost'
 import { useDispatch, useSelector } from 'react-redux'
 import { FeedPosts, ProfilePosts } from '../redux/postApiCalls'
 import Post from "./Post"
 import { useParams } from 'react-router-dom'
-import { userRequest } from '../requestMetohd'
 
-const Posts = ({profile}) => {
+const Posts = ({ profile }) => {
     // const [posts,setPosts] = useState([])
-    const params = useParams() 
+    const params = useParams()
     const dispatch = useDispatch();
-    const posts = useSelector((state)=>state.post.posts)
-
+    const { posts } = useSelector((state) => state.post)
+    const { currentUser } = useSelector((state) => state.user)
+    const [myProfile, setMyProfile]   = useState(false)
 
     useEffect(() => {
-       profile ? ProfilePosts(dispatch,params?.userId) : FeedPosts(dispatch,params?.userId)
-    }, [params]);
+        if(params?.userId === currentUser?._id){
+            setMyProfile(true)
+        }else{
+            setMyProfile(false)
+        }
+        // eslint-disable-next-line
+    }, [params])
+
+    useEffect(() => {
+        profile ? ProfilePosts(dispatch, params?.userId) : FeedPosts(dispatch, params?.userId)
+        // eslint-disable-next-line
+    }, [params,dispatch]);
     return (
         <Fragment>
-            <CreatePost />
-            { posts?.map((item)=>(
-            <Post item={item} key={item?._id}/>
+            {(myProfile || !profile) && <CreatePost/>}
+            {posts?.map((item) => (
+                <Post item={item} key={item?._id} />
             ))}
         </Fragment>
     )
