@@ -160,10 +160,7 @@ const Signup = () => {
   const navigate = useNavigate()
   const { loading, error, currentUser } = useSelector((state) => state.user)
 
-  const [userCredentials, setUserCredentials] = useState({
-    email: "",
-    password: ""
-  })
+  const [userCredentials, setUserCredentials] = useState({})
 
   const handleChange = (e) => {
     setUserCredentials((prev) => ({ ...prev, [e.target.name]: e.target.value }))
